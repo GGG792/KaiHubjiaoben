@@ -1574,6 +1574,116 @@ end});
 playertitleTab:AddButton({Text="应用更改",Callback=function()
 	data['basicdata']['otherdata']['playertitle']['tag']:update({text=data['basicdata']['otherdata']['playertitle']['text'],color=data['basicdata']['otherdata']['playertitle']['color'],size=data['basicdata']['otherdata']['playertitle']['size'],bold=data['basicdata']['otherdata']['playertitle']['bold'],italic=data['basicdata']['otherdata']['playertitle']['italic'],font=data['basicdata']['otherdata']['playertitle']['font']});
 end});
+playertitleTab:AddTitle("头顶称号");
+playertitleTab:AddParagraph({Title="头顶称号",Content="在角色头顶显示自定义称号，支持永久保存，下次启动自动加载"});
+local headTitleEnabled = false;
+local headTitleText = "";
+local headTitleColor = "#FFD700";
+local headTitleBillboard = nil;
+local headTitleConn = nil;
+local function loadTitleConfig()
+	pcall(function()
+		local saved = readfile("KaiHub_headtitle.txt");
+		local cfg = HttpService:JSONDecode(saved);
+		headTitleText = cfg.text or "";
+		headTitleColor = cfg.color or "#FFD700";
+	end);
+end
+local function saveTitleConfig()
+	pcall(function()
+		local cfg = HttpService:JSONEncode({text=headTitleText,color=headTitleColor});
+		writefile("KaiHub_headtitle.txt", cfg);
+	end);
+end
+local function createHeadTitle()
+	if headTitleBillboard then
+		pcall(function()
+			headTitleBillboard:Destroy();
+		end);
+	end
+	local char = LocalPlayer.Character;
+	if not char then
+		return;
+	end
+	local head = char:FindFirstChild("Head");
+	if not head then
+		return;
+	end
+	headTitleBillboard = Instance.new("BillboardGui");
+	headTitleBillboard.Name = "KaiHubHeadTitle";
+	headTitleBillboard.Size = UDim2.new(0, 100, 0, 30);
+	headTitleBillboard.StudsOffset = Vector3.new(0, 3.2, 0);
+	headTitleBillboard.AlwaysOnTop = true;
+	headTitleBillboard.MaxDistance = 100;
+	headTitleBillboard.Parent = head;
+	local tl = Instance.new("TextLabel");
+	tl.Name = "TitleText";
+	tl.Size = UDim2.new(1, 0, 1, 0);
+	tl.BackgroundTransparency = 1;
+	tl.RichText = true;
+	tl.Text = '<font color="' .. headTitleColor .. '">' .. (headTitleText or "") .. "</font>";
+	tl.TextSize = 16;
+	tl.Font = Enum.Font.GothamBold;
+	tl.TextStrokeTransparency = 0.3;
+	tl.TextStrokeColor3 = Color3.new(0, 0, 0);
+	tl.Parent = headTitleBillboard;
+end
+local function removeHeadTitle()
+	if headTitleBillboard then
+		pcall(function()
+			headTitleBillboard:Destroy();
+		end);
+		headTitleBillboard = nil;
+	end
+end
+loadTitleConfig();
+playertitleTab:AddToggle({Label="头顶称号开关",Default=false,Callback=function(v)
+	headTitleEnabled = v;
+	if v then
+		createHeadTitle();
+		headTitleConn = LocalPlayer.CharacterAdded:Connect(function(char)
+			task.wait(2);
+			if headTitleEnabled then
+				createHeadTitle();
+			end
+		end);
+	else
+		removeHeadTitle();
+		if headTitleConn then
+			headTitleConn:Disconnect();
+			headTitleConn = nil;
+		end
+	end
+end});
+playertitleTab:AddInput({Label="头顶称号文本",Placeholder="输入头顶称号内容",Default=headTitleText,Callback=function(text)
+	headTitleText = text;
+	saveTitleConfig();
+	if (headTitleEnabled and headTitleBillboard) then
+		local tl = headTitleBillboard:FindFirstChild("TitleText");
+		if tl then
+			tl.Text = '<font color="' .. headTitleColor .. '">' .. text .. "</font>";
+		end
+	end
+end});
+playertitleTab:AddColorPicker({Label="头顶称号颜色",Default=Color3.fromRGB(255, 215, 0),Callback=function(color)
+	headTitleColor = color3ToHex(color);
+	saveTitleConfig();
+	if (headTitleEnabled and headTitleBillboard) then
+		local tl = headTitleBillboard:FindFirstChild("TitleText");
+		if tl then
+			tl.Text = '<font color="' .. headTitleColor .. '">' .. headTitleText .. "</font>";
+		end
+	end
+end});
+playertitleTab:AddButton({Text="关闭头顶称号",Callback=function()
+	headTitleEnabled = false;
+	removeHeadTitle();
+	if headTitleConn then
+		headTitleConn:Disconnect();
+		headTitleConn = nil;
+	end
+	ChronixUI:Notify({Title="头顶称号",Content="头顶称号已关闭",Type="success",Duration=2});
+end});
 local serverQuery = ServerFinderModule.new();
 local serverTab = mainWindow:CreateTab({Name="服务器查询",HasIcon=true,IconName="server"});
 serverTab:AddTitle("公共服务器列表");
