@@ -2664,7 +2664,20 @@ pcall(function()
 	VirtualKeysGui.ZIndexBehavior = Enum.ZIndexBehavior.Sibling;
 	VirtualKeysGui.IgnoreGuiInset = true;
 	local keyButtons = {};
-	local keyConfigs = {{name="Ctrl",keyCode=Enum.KeyCode.LeftControl,color=Color3.fromRGB(255, 165, 0)},{name="Shift",keyCode=Enum.KeyCode.LeftShift,color=Color3.fromRGB(0, 200, 255)},{name="Alt",keyCode=Enum.KeyCode.LeftAlt,color=Color3.fromRGB(200, 100, 255)},{name="C",keyCode=Enum.KeyCode.C,color=Color3.fromRGB(255, 200, 0)},{name="E",keyCode=Enum.KeyCode.E,color=Color3.fromRGB(100, 255, 100)},{name="Q",keyCode=Enum.KeyCode.Q,color=Color3.fromRGB(255, 100, 100)},{name="F",keyCode=Enum.KeyCode.F,color=Color3.fromRGB(100, 200, 255)},{name="Z",keyCode=Enum.KeyCode.Z,color=Color3.fromRGB(255, 150, 200)},{name="X",keyCode=Enum.KeyCode.X,color=Color3.fromRGB(200, 200, 100)},{name="Space",keyCode=Enum.KeyCode.Space,color=Color3.fromRGB(0, 255, 150)}};
+	-- 智能虚拟按键：name=显示名, keyCode=按键, color=颜色, checkFunc=检测功能是否开启的函数
+	local function rt() return data and data['basicdata'] and data['basicdata']['releasetools']; end
+	local keyConfigs = {
+		{name="Ctrl",  keyCode=Enum.KeyCode.LeftControl, color=Color3.fromRGB(255, 165, 0), checkFunc=function() return true end},
+		{name="Shift", keyCode=Enum.KeyCode.LeftShift,   color=Color3.fromRGB(0, 200, 255),  checkFunc=function() return true end},
+		{name="Alt",   keyCode=Enum.KeyCode.LeftAlt,     color=Color3.fromRGB(200, 100, 255),checkFunc=function() return true end},
+		{name="C",     keyCode=Enum.KeyCode.C,           color=Color3.fromRGB(255, 200, 0),  checkFunc=function() local r=rt(); return r and r['zoom'] and r['zoom'].IsActive and r['zoom']:IsActive(); end},
+		{name="E",     keyCode=Enum.KeyCode.E,           color=Color3.fromRGB(100, 255, 100),checkFunc=function() return true end},
+		{name="Q",     keyCode=Enum.KeyCode.Q,           color=Color3.fromRGB(255, 100, 100),checkFunc=function() return true end},
+		{name="F",     keyCode=Enum.KeyCode.F,           color=Color3.fromRGB(100, 200, 255),checkFunc=function() return true end},
+		{name="Z",     keyCode=Enum.KeyCode.Z,           color=Color3.fromRGB(255, 150, 200),checkFunc=function() return true end},
+		{name="X",     keyCode=Enum.KeyCode.X,           color=Color3.fromRGB(200, 200, 100),checkFunc=function() return true end},
+		{name="Space", keyCode=Enum.KeyCode.Space,       color=Color3.fromRGB(0, 255, 150),  checkFunc=function() return true end},
+	};
 	local btnSize = 44;
 	local padding = 6;
 	local cols = 5;
@@ -2748,6 +2761,29 @@ pcall(function()
 		end
 		toggleBtn.Text = (vkVisible and "⌨") or "⌨";
 		toggleBtn.BackgroundTransparency = (vkVisible and 0.2) or 0.5;
+	end);
+	-- 智能显示：每秒检测哪些功能已开启，只显示需要的按键
+	local checkConnection = nil;
+	local function updateKeyVisibility()
+		if not vkVisible then return end
+		local visibleCount = 0;
+		for i, cfg in ipairs(keyConfigs) do
+			local btn = keyButtons[cfg.keyCode];
+			if btn then
+				local shouldShow = cfg.checkFunc and cfg.checkFunc();
+				btn.Visible = shouldShow;
+				if shouldShow then visibleCount = visibleCount + 1; end
+			end
+		end
+		-- 如果没有按键需要显示，隐藏整个面板
+		if visibleCount == 0 then
+			for _, btn in pairs(keyButtons) do btn.Visible = false; end
+		end
+	end
+	checkConnection = game:GetService("RunService").Heartbeat:Connect(function()
+		if tick() % 1 < 0.05 then
+			pcall(updateKeyVisibility);
+		end
 	end);
 end);
 loadingTimedOut = true;
