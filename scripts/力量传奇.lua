@@ -2,8 +2,8 @@ local WindUI = loadstring(game:HttpGet("https://raw.githubusercontent.com/Yisan8
 WindUI:AddTheme({Name="My Theme",Accent=Color3.fromHex("#18181b"),Background=Color3.fromHex("#101010"),Outline=Color3.fromHex("#FFFFFF"),Text=Color3.fromHex("#FFFFFF"),Placeholder=Color3.fromHex("#7a7a7a"),Button=Color3.fromHex("#52525b"),Icon=Color3.fromHex("#a1a1aa")});
 local Window = WindUI:CreateWindow({Title="Aero      ",Folder="Aero",SideBarWidth=180,Background="https://chaton-images.s3.us-east-2.amazonaws.com/GHn9L9UJLf0XcVNyCpbG72D0rmNmBEWndPkh6CjJNya8GLnWzz1vImvt8wlJSBwv_2700x1519x1393696.jpeg",BackgroundImageTransparency=0.5,OpenButton={Title="打开脚本",CornerRadius=UDim.new(1, 0),StrokeThickness=3,Enabled=true,Draggable=true,OnlyMobile=false,Scale=0.9,Color=ColorSequence.new(Color3.fromHex("#30FF6A"), Color3.fromHex("#e7ff2f"))},Topbar={Height=44,ButtonsType="Mac"}});
 Window:Tag({Title="V1.03",Color=Color3.fromHex("00CED1"),Radius=2});
-Window:Tag({Title="杯子狗",Icon="crown",Color=Color3.fromHex("FFD700"),Radius=2});
-Window:Tag({Title="杯子狗",Icon="square-chevron-right",Color=Color3.fromHex("#30ff6a"),Radius=2});
+Window:Tag({Title="杨志卡",Icon="crown",Color=Color3.fromHex("FFD700"),Radius=2});
+Window:Tag({Title="杨志卡",Icon="square-chevron-right",Color=Color3.fromHex("#30ff6a"),Radius=2});
 local COLOR_SCHEMES = {["彩虹颜色"]={ColorSequence.new({ColorSequenceKeypoint.new(0, Color3.fromHex("FF0000")),ColorSequenceKeypoint.new(0.16, Color3.fromHex("FFA500")),ColorSequenceKeypoint.new(0.33, Color3.fromHex("FFFF00")),ColorSequenceKeypoint.new(0.5, Color3.fromHex("00FF00")),ColorSequenceKeypoint.new(0.66, Color3.fromHex("0000FF")),ColorSequenceKeypoint.new(0.83, Color3.fromHex("4B0082")),ColorSequenceKeypoint.new(1, Color3.fromHex("EE82EE"))}),"palette"},["绿黄渐变"]={ColorSequence.new({ColorSequenceKeypoint.new(0, Color3.fromHex("30FF6A")),ColorSequenceKeypoint.new(0.5, Color3.fromHex("a8ff00")),ColorSequenceKeypoint.new(1, Color3.fromHex("e7ff2f"))}),"waves"}};
 local borderAnimation;
 local animationSpeed = 5;
@@ -1320,10 +1320,10 @@ D:Toggle({Title="沙滩深蹲架",Default=false,Callback=function(state)
 					if (game.Players.LocalPlayer.leaderstats.Strength.Value >= 1000) then
 						if (game.Players.LocalPlayer.machineInUse.Value == nil) then
 							game.Players.LocalPlayer.Character:WaitForChild("HumanoidRootPart").CFrame = CFrame.new(232.627625, 3.67689133, 96.3039856, -0.963445187, -7.786858446934275E-08, -0.267905563, -7.928652223654353E-08, 1, -5.525701674002903E-09, 0.267905563, 1.59175890246388E-08, -0.963445187);
-							wait(1E-05);
+							wait(9.999999747378752E-06);
 							local vim = game:GetService("VirtualInputManager");
 							vim:SendKeyEvent(true, "E", false, game);
-							wait(1E-05);
+							wait(9.999999747378752E-06);
 							vim:SendKeyEvent(false, "E", false, game);
 						else
 							local A_1 = "rep";
@@ -1354,10 +1354,10 @@ D:Toggle({Title="霜冻健身房深蹲架",Default=false,Callback=function(state
 					if (game.Players.LocalPlayer.leaderstats.Strength.Value >= 4000) then
 						if (game.Players.LocalPlayer.machineInUse.Value == nil) then
 							game.Players.LocalPlayer.Character:WaitForChild("HumanoidRootPart").CFrame = CFrame.new(-2629.13818, 3.36860609, -609.827454, -0.995664716, -2.6729681579240605E-08, -0.0930150598, -1.9004245288556376E-08, 1, -8.394152217761075E-08, 0.0930150598, -8.180992949746724E-08, -0.995664716);
-							wait(1E-05);
+							wait(9.999999747378752E-06);
 							local vim = game:GetService("VirtualInputManager");
 							vim:SendKeyEvent(true, "E", false, game);
-							wait(1E-05);
+							wait(9.999999747378752E-06);
 							vim:SendKeyEvent(false, "E", false, game);
 						else
 							local A_1 = "rep";
@@ -1367,7 +1367,7 @@ D:Toggle({Title="霜冻健身房深蹲架",Default=false,Callback=function(state
 						end
 					end
 				end);
-				wait(1E-05);
+				wait(9.999999747378752E-06);
 			end
 		end);
 	else
@@ -1387,10 +1387,10 @@ D:Toggle({Title="传奇健身房深蹲架",Default=false,Callback=function(state
 				pcall(function()
 					if (game.Players.LocalPlayer.machineInUse.Value == nil) then
 						game.Players.LocalPlayer.Character:WaitForChild("HumanoidRootPart").CFrame = CFrame.new(4443.04443, 987.521484, -4061.12988, 0.83309716, 3.330188347305807E-09, 0.553126693, -2.8775943849979058E-09, 1, -1.6865442376001738E-09, -0.553126693, -1.8661901191041608E-10, 0.83309716);
-						wait(1E-05);
+						wait(9.999999747378752E-06);
 						local vim = game:GetService("VirtualInputManager");
 						vim:SendKeyEvent(true, "E", false, game);
-						wait(1E-05);
+						wait(9.999999747378752E-06);
 						vim:SendKeyEvent(false, "E", false, game);
 					else
 						local A_1 = "rep";
@@ -1399,7 +1399,7 @@ D:Toggle({Title="传奇健身房深蹲架",Default=false,Callback=function(state
 						Event:FireServer(A_1, A_2);
 					end
 				end);
-				wait(1E-05);
+				wait(9.999999747378752E-06);
 			end
 		end);
 	else
@@ -1419,10 +1419,10 @@ D:Toggle({Title="肌肉之王健身房深蹲架",Default=false,Callback=function
 				pcall(function()
 					if (game.Players.LocalPlayer.machineInUse.Value == nil) then
 						game.Players.LocalPlayer.Character:WaitForChild("HumanoidRootPart").CFrame = CFrame.new(-8757.37012, 13.2186356, -6051.24365, -0.902269304, 1.6361029864242482E-08, -0.431172907, 1.7107648631053962E-08, 1, 2.146062882957267E-09, 0.431172907, -5.440027539549419E-09, -0.902269304);
-						wait(1E-05);
+						wait(9.999999747378752E-06);
 						local vim = game:GetService("VirtualInputManager");
 						vim:SendKeyEvent(true, "E", false, game);
-						wait(1E-05);
+						wait(9.999999747378752E-06);
 						vim:SendKeyEvent(false, "E", false, game);
 					else
 						local A_1 = "rep";
@@ -1431,7 +1431,7 @@ D:Toggle({Title="肌肉之王健身房深蹲架",Default=false,Callback=function
 						Event:FireServer(A_1, A_2);
 					end
 				end);
-				wait(1E-05);
+				wait(9.999999747378752E-06);
 			end
 		end);
 	else
@@ -1451,10 +1451,10 @@ D:Toggle({Title="丛林健身房深蹲架",Default=false,Callback=function(state
 				pcall(function()
 					if (game.Players.LocalPlayer.machineInUse.Value == nil) then
 						game.Players.LocalPlayer.Character:WaitForChild("HumanoidRootPart").CFrame = CFrame.new(-8383.45, 3.43 + 80, 2854.54, -0.902269304, 1.6361029864242482E-08, -0.431172907, 1.7107648631053962E-08, 1, 2.146062882957267E-09, 0.431172907, -5.440027539549419E-09, -0.902269304);
-						wait(1E-05);
+						wait(9.999999747378752E-06);
 						local vim = game:GetService("VirtualInputManager");
 						vim:SendKeyEvent(true, "E", false, game);
-						wait(1E-05);
+						wait(9.999999747378752E-06);
 						vim:SendKeyEvent(false, "E", false, game);
 					else
 						local A_1 = "rep";
@@ -1463,7 +1463,7 @@ D:Toggle({Title="丛林健身房深蹲架",Default=false,Callback=function(state
 						Event:FireServer(A_1, A_2);
 					end
 				end);
-				wait(1E-05);
+				wait(9.999999747378752E-06);
 			end
 		end);
 	else
@@ -1485,10 +1485,10 @@ D:Toggle({Title="沙滩引体向上",Default=false,Callback=function(state)
 					if (game.Players.LocalPlayer.leaderstats.Strength.Value >= 1000) then
 						if (game.Players.LocalPlayer.machineInUse.Value == nil) then
 							game.Players.LocalPlayer.Character:WaitForChild("HumanoidRootPart").CFrame = CFrame.new(-185.157745, 5.81071186, 104.747154, 0.227061391, -8.236332504907296E-09, 0.97388047, 5.5850282620895086E-08, 1, -4.564328026646081E-09, -0.97388047, 5.54278827280541E-08, 0.227061391);
-							wait(1E-05);
+							wait(9.999999747378752E-06);
 							local vim = game:GetService("VirtualInputManager");
 							vim:SendKeyEvent(true, "E", false, game);
-							wait(1E-05);
+							wait(9.999999747378752E-06);
 							vim:SendKeyEvent(false, "E", false, game);
 						else
 							local A_1 = "rep";
@@ -1498,7 +1498,7 @@ D:Toggle({Title="沙滩引体向上",Default=false,Callback=function(state)
 						end
 					end
 				end);
-				wait(1E-05);
+				wait(9.999999747378752E-06);
 			end
 		end);
 	else
@@ -1519,10 +1519,10 @@ D:Toggle({Title="神话健身房引体向上",Default=false,Callback=function(st
 					if (game.Players.LocalPlayer.leaderstats.Strength.Value >= 4000) then
 						if (game.Players.LocalPlayer.machineInUse.Value == nil) then
 							game.Players.LocalPlayer.Character:WaitForChild("HumanoidRootPart").CFrame = CFrame.new(2315.82104, 5.81071281, 847.153076, 0.993555248, 6.99809632465076E-08, 0.113349125, -7.052988593159171E-08, 1, 8.325546918541704E-10, -0.113349125, -8.821689156945922E-09, 0.993555248);
-							wait(1E-05);
+							wait(9.999999747378752E-06);
 							local vim = game:GetService("VirtualInputManager");
 							vim:SendKeyEvent(true, "E", false, game);
-							wait(1E-05);
+							wait(9.999999747378752E-06);
 							vim:SendKeyEvent(false, "E", false, game);
 						else
 							local A_1 = "rep";
@@ -1532,7 +1532,7 @@ D:Toggle({Title="神话健身房引体向上",Default=false,Callback=function(st
 						end
 					end
 				end);
-				wait(1E-05);
+				wait(9.999999747378752E-06);
 			end
 		end);
 	else

@@ -383,7 +383,7 @@ RunService.Heartbeat:Connect(function(deltaTime)
 	end
 	CheckBackstabThreat();
 end);
-local Window = WindUI:CreateWindow({Title="Aero",Author="作者杯子狗",Folder="CloudHub",Size=UDim2.fromOffset(200, 395),Transparent=true,Theme="Dark",User={Enabled=false,Callback=function()
+local Window = WindUI:CreateWindow({Title="Aero",Author="杨志卡",Folder="CloudHub",Size=UDim2.fromOffset(200, 395),Transparent=true,Theme="Dark",User={Enabled=false,Callback=function()
 	print("clicked");
 end,Anonymous=false},SideBarWidth=135,ScrollBarEnabled=true,Background="https://chaton-images.s3.us-east-2.amazonaws.com/s4yJDF1Bl3xcR3Ltz60UHmpi6kCcCkepFA8nPI6L7aC2CgawVKOOJOiUTQvwpg8n_2043x1502x281275.jpeg",BackgroundImageTransparency=0});
 Window:EditOpenButton({Title="摸摸神仇",Icon="https://chaton-images.s3.us-east-2.amazonaws.com/hwD15C7Z0RT0PGftiFJtq4NGF538jL82ZmzPsUiCJ674ICGa8drYR9ufaYBGE866_2043x1502x492511.jpeg",CornerRadius=UDim.new(0, 16),StrokeThickness=2.35,Color=ColorSequence.new(Color3.fromHex("3C1361"), Color3.fromHex("6A0DAD")),Draggable=true});
@@ -1315,7 +1315,7 @@ do
 	AboutTab:Section({Title="Aero脚本竞争对手",TextSize=20,FontWeight=Enum.FontWeight.Bold});
 	AboutTab:Space();
 	AboutTab:Section({Title="用的人都是萌萌人\nAero牛逼",TextSize=16,TextTransparency=0.3});
-	AboutTab:Section({Title="作者杯子狗",TextSize=16,TextTransparency=0.3});
+	AboutTab:Section({Title="作者杨志卡",TextSize=16,TextTransparency=0.3});
 	AboutTab:Space({Columns=2});
 	AboutTab:Button({Title="销毁UI",Color=Red,Justify="Center",Callback=function()
 		if JumpConnection then
