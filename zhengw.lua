@@ -931,6 +931,23 @@ ToolsTab:AddButton({Text="终止当前游戏进程",Callback=function()
 		end
 	end
 end});
+ToolsTab:AddTitle("一键踢出服务器");
+ToolsTab:AddParagraph({Title="踢出服务器",Content="将自己踢出当前服务器，可自定义踢出原因显示在断开连接界面"});
+local kickMsg = "";
+ToolsTab:AddInput({Text="踢出原因",Placeholder="输入踢出原因（留空则默认）",Callback=function(value)
+	kickMsg = value;
+end});
+ToolsTab:AddButton({Text="踢出服务器",Callback=function()
+	local reason = (kickMsg and (#kickMsg > 0) and kickMsg) or "You have been kicked from the game.";
+	pcall(function()
+		game:GetService("Players").LocalPlayer:Kick(reason);
+	end);
+end});
+ToolsTab:AddButton({Text="快速踢出（无原因）",Callback=function()
+	pcall(function()
+		game:GetService("Players").LocalPlayer:Kick();
+	end);
+end});
 local scripthubTab = mainWindow:CreateTab({Name="脚本中心",HasIcon=true,IconName="computer"});
 scripthubTab:AddTitle("由杨志卡推荐的脚本 - 注意大部分脚本未经过验证，请谨慎使用。");
 local function addscripts(name, link)
@@ -2652,5 +2669,4 @@ pcall(function()
 end);
 _G.ChronixHubisLoaded = true;
 _G.ChronixHubLoading = false;
--- 虚拟按键已删除
 loadingTimedOut = true;
