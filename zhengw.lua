@@ -932,7 +932,7 @@ ToolsTab:AddButton({Text="终止当前游戏进程",Callback=function()
 	end
 end});
 local scripthubTab = mainWindow:CreateTab({Name="脚本中心",HasIcon=true,IconName="computer"});
-scripthubTab:AddTitle("由作者推荐的脚本 - 注意大部分脚本未经过验证，请谨慎使用。");
+scripthubTab:AddTitle("由杨志卡推荐的脚本 - 注意大部分脚本未经过验证，请谨慎使用。");
 local function addscripts(name, link)
 	scripthubTab:AddButton({Text=name,Callback=function()
 		ChronixUI:Notify({Title="提示",Content=(name .. "正在启动，请耐心等待。"),Type="info",Duration=5});
