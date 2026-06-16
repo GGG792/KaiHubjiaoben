@@ -5,7 +5,7 @@ local TweenService = game:GetService("TweenService");
 local UserInputService = game:GetService("UserInputService");
 local Lighting = game:GetService("Lighting");
 local Camera = workspace.CurrentCamera;
-local MAIN_URL = "https://raw.githubusercontent.com/GGG792/KaiHubjiaoben/refs/heads/main/zhengw.lua";
+local MAIN_URL = "https://raw.kkgithub.com/GGG792/KaiHubjiaoben/refs/heads/main/zhengw.lua";
 local THEME = {Background=Color3.fromRGB(30, 30, 46),Sidebar=Color3.fromRGB(24, 24, 37),Accent=Color3.fromRGB(119, 221, 255),Text=Color3.fromRGB(255, 255, 255),TextDark=Color3.fromRGB(170, 170, 170),Border=Color3.fromRGB(44, 44, 62),Card=Color3.fromRGB(37, 37, 53),Hover=Color3.fromRGB(45, 45, 65),Success=Color3.fromRGB(46, 213, 115),Error=Color3.fromRGB(255, 71, 87)};
 local screenSize = Camera.ViewportSize;
 local isMobile = UserInputService.TouchEnabled and not UserInputService.MouseEnabled;
