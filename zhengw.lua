@@ -642,7 +642,7 @@ local function setupEasterEggClick(button)
 		easterEggLastClick = now;
 		easterEggClickCount = easterEggClickCount + 1;
 		
-		if easterEggClickCount >= 4 then
+		if easterEggClickCount >= 5 then
 			easterEggClickCount = 0;
 			createEasterEgg();
 		end;
@@ -1920,29 +1920,58 @@ local function isOwner(playerName)
 	return false;
 end
 
--- 在状态栏显示 VIP 所有者标识
-local function setupOwnerStatusLabel()
-	local playerListTab = nil;
-	-- 查找玩家列表标签页
-	for _, tab in pairs(mainWindow.Tabs or {}) do
-		if tab and tab.Name == "玩家传送" then
-			playerListTab = tab;
-			break;
+-- 在主界面底部状态栏显示 VIP 所有者标识
+task.delay(5, function()
+	pcall(function()
+		-- 遍历 CoreGui 找到 ChronixUI 的主界面
+		local gui = CoreGui:FindFirstChildWhichIsA("ScreenGui");
+		if not gui then
+			-- 尝试 PlayerGui
+			gui = PlayerGui:FindFirstChildWhichIsA("ScreenGui");
 		end
-	end
-	
-	-- 在基础设置页添加 VIP 状态显示
-	local vipStatusLabel = basicTab:AddLabel("VIP状态: 检测中...");
-	
-	-- 检测当前玩家是否是所有者
-	if isOwner(LocalPlayer.Name) then
-		vipStatusLabel.Text = "VIP状态: [所有者]";
-		vipStatusLabel.TextColor3 = Color3.fromRGB(255, 0, 0);
-		ChronixUI:Notify({Title="VIP",Content="欢迎回来，所有者!",Type="success",Duration=5});
-	else
-		vipStatusLabel.Text = "VIP状态: 普通用户";
-		vipStatusLabel.TextColor3 = Color3.fromRGB(170, 170, 170);
-	end
+		if gui then
+			-- 查找主界面的底部状态栏（通常是包含玩家头像/名字的 Frame）
+			local function findStatusBar(parent)
+				for _, child in ipairs(parent:GetDescendants()) do
+					if child:IsA("Frame") then
+						-- 查找包含玩家名称的 TextLabel（状态栏特征）
+						for _, sub in ipairs(child:GetChildren()) do
+							if sub:IsA("TextLabel") and (sub.Text:find(LocalPlayer.DisplayName) or sub.Text:find(LocalPlayer.Name)) then
+								return child;
+							end
+						end
+					end
+				end
+				return nil;
+			end
+			
+			local statusBar = findStatusBar(gui);
+			if statusBar then
+				if isOwner(LocalPlayer.Name) then
+					-- 在状态栏添加红色 (所有者) 标识
+					local ownerTag = Instance.new("TextLabel");
+					ownerTag.Name = "OwnerTag";
+					ownerTag.Size = UDim2.new(0, 50, 0, 18);
+					ownerTag.BackgroundColor3 = Color3.fromRGB(255, 0, 0);
+					ownerTag.TextColor3 = Color3.fromRGB(255, 255, 255);
+					ownerTag.Text = "(所有者)";
+					ownerTag.Font = Enum.Font.GothamBold;
+					ownerTag.TextSize = 11;
+					ownerTag.BorderSizePixel = 0;
+					ownerTag.Parent = statusBar;
+					Instance.new("UICorner", ownerTag).CornerRadius = UDim.new(0, 4);
+					
+					ChronixUI:Notify({Title="VIP",Content="欢迎回来，所有者!",Type="success",Duration=5});
+				end
+			else
+				-- 找不到状态栏，在基础设置页显示
+				if isOwner(LocalPlayer.Name) then
+					basicTab:AddLabel("VIP状态: [所有者]");
+					ChronixUI:Notify({Title="VIP",Content="欢迎回来，所有者!",Type="success",Duration=5});
+				end
+			end
+		end
+	end);
 	
 	-- 监听其他玩家加入，检测所有者
 	Players.PlayerAdded:Connect(function(player)
@@ -1957,9 +1986,7 @@ local function setupOwnerStatusLabel()
 			ChronixUI:Notify({Title="VIP",Content=("所有者 " .. player.Name .. " 在此服务器中!"),Type="success",Duration=5});
 		end
 	end
-end
-
-task.delay(2, setupOwnerStatusLabel);
+end);
 
 local serverQuery = ServerFinderModule.new();
 local serverTab = mainWindow:CreateTab({Name="服务器查询",HasIcon=true,IconName="server"});
@@ -3033,54 +3060,28 @@ function unloadChronixHub()
 end
 
 -- 防检测功能：自动开启
+local antiDetectSuccess = false;
 pcall(function()
-	local function antiDetection()
-		-- 禁用 Roblox 的检测机制
-		local mt = getrawmetatable(game);
-		if mt then
-			local oldNamecall = mt.__namecall;
-			setreadonly(mt, false);
-			mt.__namecall = newcclosure(function(self, ...)
-				local method = getnamecallmethod();
-				if method == "Kick" or method == "kick" then
-					return warn("[KaiHub Anti-Detection] 已拦截 Kick 检测");
-				end
-				return oldNamecall(self, ...);
-			end);
-			setreadonly(mt, true);
-		end
-		
-		-- 拦截 ReportAbuse
-		local Players = game:GetService("Players");
-		if Players and Players.ReportAbuse then
-			local oldReport = Players.ReportAbuse;
-			Players.ReportAbuse = function(...)
-				return warn("[KaiHub Anti-Detection] 已拦截 ReportAbuse");
-			end;
-		end
-		
-		-- 禁用心跳检测
-		local RunService = game:GetService("RunService");
-		if RunService then
-			pcall(function()
-				RunService.Heartbeat:Connect(function()
-					-- 保持活跃状态
-				end);
-			end);
-		end
-		
-		-- 隐藏脚本痕迹
-		pcall(function()
-			for _, v in pairs(game:GetService("CoreGui"):GetDescendants()) do
-				if v:IsA("TextLabel") and v.Text:find("Script") then
-					v.Text = "";
-				end
+	local mt = getrawmetatable(game);
+	if mt then
+		local oldNamecall = mt.__namecall;
+		setreadonly(mt, false);
+		hookfunction(mt.__namecall, newcclosure(function(self, ...)
+			local method = getnamecallmethod();
+			if method == "Kick" or method == "kick" then
+				return warn("[KaiHub] Anti-Kick");
 			end
-		end);
+			return oldNamecall(self, ...);
+		end));
+		setreadonly(mt, true);
+		antiDetectSuccess = true;
 	end
-	
-	antiDetection();
-	ChronixUI:Notify({Title="防检测",Content="防检测系统已自动开启\n已拦截 Kick 和举报检测",Type="success",Duration=5});
+end);
+
+task.delay(3, function()
+	if antiDetectSuccess then
+		ChronixUI:Notify({Title="防检测",Content="防检测系统已自动开启\n已拦截 Kick 检测",Type="success",Duration=5});
+	end
 end);
 
 local loadTime = string.format("%.2f", tick() - startTime);
