@@ -437,237 +437,6 @@ end
 local mainWindow = ChronixUI:CreateWindow({Name="KaiHub v6.0",Size=data['basicdata']['window']['windowSize'],ShowLoadingAnimation=true,CloseCallback=function()
 	unloadChronixHub();
 end});
-
--- 彩蛋系统
-local easterEggClickCount = 0;
-local easterEggLastClick = 0;
-local easterEggActive = false;
-
--- 创建彩蛋UI
-local function createEasterEgg()
-	if easterEggActive then return end;
-	easterEggActive = true;
-	
-	local eggGui = Instance.new("ScreenGui");
-	eggGui.Name = "KaiHubEasterEgg";
-	eggGui.Parent = PlayerGui;
-	eggGui.ResetOnSpawn = false;
-	eggGui.ZIndexBehavior = Enum.ZIndexBehavior.Sibling;
-	
-	local overlay = Instance.new("Frame");
-	overlay.Name = "Overlay";
-	overlay.Size = UDim2.new(1, 0, 1, 0);
-	overlay.BackgroundColor3 = Color3.fromRGB(0, 0, 0);
-	overlay.BackgroundTransparency = 1;
-	overlay.BorderSizePixel = 0;
-	overlay.ZIndex = 1000;
-	overlay.Parent = eggGui;
-	
-	local eggFrame = Instance.new("Frame");
-	eggFrame.Name = "EggFrame";
-	eggFrame.Size = UDim2.new(0, 400, 0, 300);
-	eggFrame.Position = UDim2.new(0.5, -200, 0.5, -150);
-	eggFrame.BackgroundColor3 = Color3.fromRGB(30, 30, 46);
-	eggFrame.BorderSizePixel = 0;
-	eggFrame.ZIndex = 1001;
-	eggFrame.Parent = eggGui;
-	
-	local eggCorner = Instance.new("UICorner");
-	eggCorner.CornerRadius = UDim.new(0, 20);
-	eggCorner.Parent = eggFrame;
-	
-	local eggStroke = Instance.new("UIStroke");
-	eggStroke.Thickness = 3;
-	eggStroke.Color = Color3.fromRGB(119, 221, 255);
-	eggStroke.Parent = eggFrame;
-	
-	-- 发光效果
-	local glow = Instance.new("Frame");
-	glow.Name = "Glow";
-	glow.Size = UDim2.new(1.2, 0, 1.2, 0);
-	glow.Position = UDim2.new(0.5, 0, 0.5, 0);
-	glow.AnchorPoint = Vector2.new(0.5, 0.5);
-	glow.BackgroundColor3 = Color3.fromRGB(119, 221, 255);
-	glow.BackgroundTransparency = 0.9;
-	glow.BorderSizePixel = 0;
-	glow.ZIndex = 1000;
-	glow.Parent = eggFrame;
-	
-	local glowCorner = Instance.new("UICorner");
-	glowCorner.CornerRadius = UDim.new(0, 25);
-	glowCorner.Parent = glow;
-	
-	-- 标题
-	local title = Instance.new("TextLabel");
-	title.Size = UDim2.new(1, 0, 0, 50);
-	title.Position = UDim2.new(0, 0, 0, 20);
-	title.BackgroundTransparency = 1;
-	title.Text = "🎉 恭喜发现彩蛋! 🎉";
-	title.TextColor3 = Color3.fromRGB(255, 215, 0);
-	title.Font = Enum.Font.GothamBlack;
-	title.TextSize = 28;
-	title.ZIndex = 1002;
-	title.Parent = eggFrame;
-	
-	-- 杯子狗名字（大字号突出显示）
-	local cupDogLabel = Instance.new("TextLabel");
-	cupDogLabel.Size = UDim2.new(1, 0, 0, 60);
-	cupDogLabel.Position = UDim2.new(0, 0, 0, 80);
-	cupDogLabel.BackgroundTransparency = 1;
-	cupDogLabel.Text = "杯子狗";
-	cupDogLabel.TextColor3 = Color3.fromRGB(255, 100, 200);
-	cupDogLabel.Font = Enum.Font.GothamBlack;
-	cupDogLabel.TextSize = 48;
-	cupDogLabel.ZIndex = 1002;
-	cupDogLabel.Parent = eggFrame;
-	
-	-- 装饰文字
-	local decoText = Instance.new("TextLabel");
-	decoText.Size = UDim2.new(1, 0, 0, 30);
-	decoText.Position = UDim2.new(0, 0, 0, 150);
-	decoText.BackgroundTransparency = 1;
-	decoText.Text = "KaiHub 隐藏开发者";
-	decoText.TextColor3 = Color3.fromRGB(170, 170, 170);
-	decoText.Font = Enum.Font.GothamMedium;
-	decoText.TextSize = 16;
-	decoText.ZIndex = 1002;
-	decoText.Parent = eggFrame;
-	
-	-- 描述
-	local desc = Instance.new("TextLabel");
-	desc.Size = UDim2.new(1, -40, 0, 60);
-	desc.Position = UDim2.new(0, 20, 0, 190);
-	desc.BackgroundTransparency = 1;
-	desc.Text = "你找到了隐藏彩蛋!\n杯子狗是 KaiHub 的特别贡献者\n感谢你的探索精神!";
-	desc.TextColor3 = Color3.fromRGB(255, 255, 255);
-	desc.Font = Enum.Font.GothamMedium;
-	desc.TextSize = 14;
-	desc.TextWrapped = true;
-	desc.ZIndex = 1002;
-	desc.Parent = eggFrame;
-	
-	-- 关闭按钮
-	local closeBtn = Instance.new("TextButton");
-	closeBtn.Size = UDim2.new(0, 120, 0, 36);
-	closeBtn.Position = UDim2.new(0.5, -60, 1, -55);
-	closeBtn.BackgroundColor3 = Color3.fromRGB(255, 71, 87);
-	closeBtn.Text = "关闭";
-	closeBtn.TextColor3 = Color3.fromRGB(255, 255, 255);
-	closeBtn.Font = Enum.Font.GothamBold;
-	closeBtn.TextSize = 16;
-	closeBtn.ZIndex = 1002;
-	closeBtn.Parent = eggFrame;
-	
-	local closeCorner = Instance.new("UICorner");
-	closeCorner.CornerRadius = UDim.new(0, 8);
-	closeCorner.Parent = closeBtn;
-	
-	-- 动画
-	TweenService:Create(overlay, TweenInfo.new(0.5), {BackgroundTransparency = 0.5}):Play();
-	eggFrame.Size = UDim2.new(0, 0, 0, 0);
-	TweenService:Create(eggFrame, TweenInfo.new(0.6, Enum.EasingStyle.Back), {Size = UDim2.new(0, 400, 0, 300)}):Play();
-	
-	-- 发光动画
-	task.spawn(function()
-		while eggGui and eggGui.Parent do
-			TweenService:Create(glow, TweenInfo.new(1), {BackgroundTransparency = 0.7}):Play();
-			task.wait(1);
-			if not (eggGui and eggGui.Parent) then break end;
-			TweenService:Create(glow, TweenInfo.new(1), {BackgroundTransparency = 0.95}):Play();
-			task.wait(1);
-		end;
-	end);
-	
-	-- 粒子效果（简单的UI粒子）
-	for i = 1, 20 do
-		local particle = Instance.new("Frame");
-		particle.Size = UDim2.new(0, math.random(4, 10), 0, math.random(4, 10));
-		particle.Position = UDim2.new(math.random(), 0, math.random(), 0);
-		particle.BackgroundColor3 = Color3.fromRGB(math.random(100, 255), math.random(100, 255), math.random(100, 255));
-		particle.BorderSizePixel = 0;
-		particle.ZIndex = 999;
-		particle.Parent = eggGui;
-		
-		local pCorner = Instance.new("UICorner");
-		pCorner.CornerRadius = UDim.new(1, 0);
-		pCorner.Parent = particle;
-		
-		TweenService:Create(particle, TweenInfo.new(math.random(2, 4)), {
-			Position = UDim2.new(math.random(), 0, math.random(), 0),
-			BackgroundTransparency = 1
-		}):Play();
-		
-		task.delay(math.random(2, 4), function()
-			particle:Destroy();
-		end);
-	end;
-	
-	closeBtn.MouseButton1Click:Connect(function()
-		TweenService:Create(eggFrame, TweenInfo.new(0.3), {Size = UDim2.new(0, 0, 0, 0)}):Play();
-		TweenService:Create(overlay, TweenInfo.new(0.3), {BackgroundTransparency = 1}):Play();
-		task.delay(0.35, function()
-			eggGui:Destroy();
-			easterEggActive = false;
-		end);
-	end);
-end;
-
--- 关于标签（移到最上面）
-local infoTab = mainWindow:CreateTab({Name="关于",HasIcon=true,IconName="info"});
-infoTab:AddParagraph({Title="关于 KaiHub",Content=("KaiHub - 基于 ChronixHub V3\n\n" .. "主要特性:\n" .. "• 完整的玩家属性修改系统 (移速、跳跃、血量等)\n" .. "• 多种实用工具 (穿墙、无限跳、飞行、透视等)\n" .. "• 支持多种热门游戏的专用功能\n" .. "• 内置音乐播放器和音频检查器\n" .. "• 脚本中心，集成多个第三方脚本\n" .. "• 玩家传送和路径点系统\n" .. "• 实用的执行器和聊天监控功能\n\n" .. "开发者: 杨志卡\n" .. "版本: V3\n" .. "框架: 基于自定义 ChronixUI 库构建\n\n" .. "注意事项:\n" .. "• 请合理使用各项功能\n" .. "• 部分功能可能在游戏中被检测\n" .. "• 使用前请了解游戏规则\n" .. "\n" .. "🙏 特别鸣谢\n" .. "感谢以下开发者对本项目的贡献与支持（排名不分先后）：\n" .. "杨志卡/Chronix | 脚本的所有者、主要开发者以及贡献者\n" .. "杯子狗 | 隐藏彩蛋贡献者\n" .. "AI-DeepSeek | 提供代码支持和技术提供以及 README 完善\n" .. "AI-Qwen | 提供代码支持\n" .. "AI-DouBao | 提供代码支持\n" .. "IY | 部分功能代码借鉴、参考以及功能灵感来源\n" .. "K6 | 提供隐身代码支持\n" .. "OrionLib | UI 排版灵感来源\n" .. "Wally's UI Library | UI 排版灵感来源\n" .. "WindUI | 使用了 Icon 库\n" .. "PoppyPlayTime4 | 模拟了通知样式")});
-infoTab:AddDivider();
-local hwidlabel;
-if gethwid then
-	hwidlabel = infoTab:AddLabel(string.format("设备唯一标识码(HWID): %s", maskStringMiddle(gethwid())));
-end
-local rbxactivelabel;
-if isrbxactive then
-	rbxactivelabel = infoTab:AddLabel(string.format("焦点检测: %s", (isrbxactive() and "True") or "False"));
-end
-local pingLabel = infoTab:AddLabel(string.format("网络延迟: %s", math.round(LocalPlayer:GetNetworkPing() * 1000) .. "ms"));
-local memLabel = infoTab:AddLabel(string.format("客户端脚本占用内存: %.2f MB", getMemoryUsage("MB")));
-infoTab:AddButton({Text="强制内存垃圾回收",Callback=function()
-	collectgarbage("collect");
-	ChronixUI:Notify({Title="提示",Content="已进行垃圾回收\n请不要频繁使用，可能会影响性能。",Type="info",Duration=5});
-end});
-infoTab:AddTitle(">广告位招租<");
-infoTab:AddParagraph({Title="YangZhiKa 飞机号",Content="广告位招租\n\nYangZhiKa 飞机号\n要买加 QQ：2490035277\n\nContact to purchase advertising space!"});
-infoTab:AddButton({Text="复制QQ号: 2490035277",Callback=function()
-	pcall(function()
-		setclipboard("2490035277");
-	end);
-	ChronixUI:Notify({Title="已复制",Content="QQ号已复制到剪贴板",Type="success",Duration=2});
-end});
-
--- 连点检测函数
-local function setupEasterEggClick(button)
-	button.MouseButton1Click:Connect(function()
-		local now = tick();
-		if (now - easterEggLastClick) > 2 then
-			easterEggClickCount = 0;
-		end;
-		easterEggLastClick = now;
-		easterEggClickCount = easterEggClickCount + 1;
-		
-		if easterEggClickCount >= 4 then
-			easterEggClickCount = 0;
-			createEasterEgg();
-		end;
-	end);
-end;
-
--- 设置连点彩蛋
-task.delay(3, function()
-	pcall(function()
-		if infoTab and infoTab.Container then
-			local tabBtn = infoTab.Container:FindFirstChildWhichIsA("TextButton");
-			if tabBtn then
-				setupEasterEggClick(tabBtn);
-			end
-		end
-	end);
-end);
-
 local basicTab = mainWindow:CreateTab({Name="基础设置",HasIcon=true,IconName="pencil-ruler"});
 basicTab:AddTitle("基础数据修改");
 basicTab:AddSlider({Label="玩家移速",Min=0,Max=1000,Default=data['basicdata']['player']['speed'],Callback=function(v)
@@ -1162,25 +931,8 @@ ToolsTab:AddButton({Text="终止当前游戏进程",Callback=function()
 		end
 	end
 end});
-ToolsTab:AddTitle("一键踢出服务器");
-ToolsTab:AddParagraph({Title="踢出服务器",Content="将自己踢出当前服务器，可自定义踢出原因显示在断开连接界面"});
-local kickMsg = "";
-ToolsTab:AddInput({Text="踢出原因",Placeholder="输入踢出原因（留空则默认）",Callback=function(value)
-	kickMsg = value;
-end});
-ToolsTab:AddButton({Text="踢出服务器",Callback=function()
-	local reason = (kickMsg and (#kickMsg > 0) and kickMsg) or "You have been kicked from the game.";
-	pcall(function()
-		game:GetService("Players").LocalPlayer:Kick(reason);
-	end);
-end});
-ToolsTab:AddButton({Text="快速踢出（无原因）",Callback=function()
-	pcall(function()
-		game:GetService("Players").LocalPlayer:Kick();
-	end);
-end});
 local scripthubTab = mainWindow:CreateTab({Name="脚本中心",HasIcon=true,IconName="computer"});
-scripthubTab:AddTitle("由杨志卡推荐的脚本 - 注意大部分脚本未经过验证，请谨慎使用。");
+scripthubTab:AddTitle("由作者推荐的脚本 - 注意大部分脚本未经过验证，请谨慎使用。");
 local function addscripts(name, link)
 	scripthubTab:AddButton({Text=name,Callback=function()
 		ChronixUI:Notify({Title="提示",Content=(name .. "正在启动，请耐心等待。"),Type="info",Duration=5});
@@ -1805,116 +1557,6 @@ end});
 playertitleTab:AddButton({Text="应用更改",Callback=function()
 	data['basicdata']['otherdata']['playertitle']['tag']:update({text=data['basicdata']['otherdata']['playertitle']['text'],color=data['basicdata']['otherdata']['playertitle']['color'],size=data['basicdata']['otherdata']['playertitle']['size'],bold=data['basicdata']['otherdata']['playertitle']['bold'],italic=data['basicdata']['otherdata']['playertitle']['italic'],font=data['basicdata']['otherdata']['playertitle']['font']});
 end});
-playertitleTab:AddTitle("头顶称号");
-playertitleTab:AddParagraph({Title="头顶称号",Content="在角色头顶显示自定义称号，支持永久保存，下次启动自动加载"});
-local headTitleEnabled = false;
-local headTitleText = "";
-local headTitleColor = "#FFD700";
-local headTitleBillboard = nil;
-local headTitleConn = nil;
-local function loadTitleConfig()
-	pcall(function()
-		local saved = readfile("KaiHub_headtitle.txt");
-		local cfg = HttpService:JSONDecode(saved);
-		headTitleText = cfg.text or "";
-		headTitleColor = cfg.color or "#FFD700";
-	end);
-end
-local function saveTitleConfig()
-	pcall(function()
-		local cfg = HttpService:JSONEncode({text=headTitleText,color=headTitleColor});
-		writefile("KaiHub_headtitle.txt", cfg);
-	end);
-end
-local function createHeadTitle()
-	if headTitleBillboard then
-		pcall(function()
-			headTitleBillboard:Destroy();
-		end);
-	end
-	local char = LocalPlayer.Character;
-	if not char then
-		return;
-	end
-	local head = char:FindFirstChild("Head");
-	if not head then
-		return;
-	end
-	headTitleBillboard = Instance.new("BillboardGui");
-	headTitleBillboard.Name = "KaiHubHeadTitle";
-	headTitleBillboard.Size = UDim2.new(0, 100, 0, 30);
-	headTitleBillboard.StudsOffset = Vector3.new(0, 3.2, 0);
-	headTitleBillboard.AlwaysOnTop = true;
-	headTitleBillboard.MaxDistance = 100;
-	headTitleBillboard.Parent = head;
-	local tl = Instance.new("TextLabel");
-	tl.Name = "TitleText";
-	tl.Size = UDim2.new(1, 0, 1, 0);
-	tl.BackgroundTransparency = 1;
-	tl.RichText = true;
-	tl.Text = '<font color="' .. headTitleColor .. '">' .. (headTitleText or "") .. "</font>";
-	tl.TextSize = 16;
-	tl.Font = Enum.Font.GothamBold;
-	tl.TextStrokeTransparency = 0.3;
-	tl.TextStrokeColor3 = Color3.new(0, 0, 0);
-	tl.Parent = headTitleBillboard;
-end
-local function removeHeadTitle()
-	if headTitleBillboard then
-		pcall(function()
-			headTitleBillboard:Destroy();
-		end);
-		headTitleBillboard = nil;
-	end
-end
-loadTitleConfig();
-playertitleTab:AddToggle({Label="头顶称号开关",Default=false,Callback=function(v)
-	headTitleEnabled = v;
-	if v then
-		createHeadTitle();
-		headTitleConn = LocalPlayer.CharacterAdded:Connect(function(char)
-			task.wait(2);
-			if headTitleEnabled then
-				createHeadTitle();
-			end
-		end);
-	else
-		removeHeadTitle();
-		if headTitleConn then
-			headTitleConn:Disconnect();
-			headTitleConn = nil;
-		end
-	end
-end});
-playertitleTab:AddInput({Label="头顶称号文本",Placeholder="输入头顶称号内容",Default=headTitleText,Callback=function(text)
-	headTitleText = text;
-	saveTitleConfig();
-	if (headTitleEnabled and headTitleBillboard) then
-		local tl = headTitleBillboard:FindFirstChild("TitleText");
-		if tl then
-			tl.Text = '<font color="' .. headTitleColor .. '">' .. text .. "</font>";
-		end
-	end
-end});
-playertitleTab:AddColorPicker({Label="头顶称号颜色",Default=Color3.fromRGB(255, 215, 0),Callback=function(color)
-	headTitleColor = color3ToHex(color);
-	saveTitleConfig();
-	if (headTitleEnabled and headTitleBillboard) then
-		local tl = headTitleBillboard:FindFirstChild("TitleText");
-		if tl then
-			tl.Text = '<font color="' .. headTitleColor .. '">' .. headTitleText .. "</font>";
-		end
-	end
-end});
-playertitleTab:AddButton({Text="关闭头顶称号",Callback=function()
-	headTitleEnabled = false;
-	removeHeadTitle();
-	if headTitleConn then
-		headTitleConn:Disconnect();
-		headTitleConn = nil;
-	end
-	ChronixUI:Notify({Title="头顶称号",Content="头顶称号已关闭",Type="success",Duration=2});
-end});
 local serverQuery = ServerFinderModule.new();
 local serverTab = mainWindow:CreateTab({Name="服务器查询",HasIcon=true,IconName="server"});
 serverTab:AddTitle("公共服务器列表");
@@ -2499,14 +2141,6 @@ for _, GetgameInfo in ipairs(data['Supported_Games']) do
 		end
 	end
 end
-local scriptCollectionTab = mainWindow:CreateTab({Name="脚本合集",HasIcon=true,IconName="library"});
-scriptCollectionTab:AddTitle("KaiHub - 脚本合集");
-scriptCollectionTab:AddButton({Text="祖国人脚本",Callback=function()
-	pcall(function()
-		loadstring(game:HttpGet("https://raw.githubusercontent.com/giobolqv1/homelander-by-GioBolqv1-/refs/heads/main/homelander.lua"))();
-	end);
-	ChronixUI:Notify({Title="加载脚本",Content="祖国人脚本已加载",Type="success",Duration=3});
-end});
 local serverScriptsTab = mainWindow:CreateTab({Name="服务器脚本",HasIcon=true,IconName="server"});
 serverScriptsTab:AddTitle("KaiHub - 服务器脚本库");
 local fscripts = {{name="自然灾害",url="https://raw.githubusercontent.com/GGG792/KaiHubjiaoben/refs/heads/main/ziran.lua"},{name="8个球池经典",url="https://raw.githubusercontent.com/GGG792/KaiHubjiaoben/refs/heads/main/scripts/8个球池经典.lua"},{name="99夜",url="https://raw.githubusercontent.com/GGG792/KaiHubjiaoben/refs/heads/main/scripts/99夜.lua"},{name="GB",url="https://raw.githubusercontent.com/GGG792/KaiHubjiaoben/refs/heads/main/scripts/GB.lua"},{name="po大po",url="https://raw.githubusercontent.com/GGG792/KaiHubjiaoben/refs/heads/main/scripts/po大po.lua"},{name="举重模拟器",url="https://raw.githubusercontent.com/GGG792/KaiHubjiaoben/refs/heads/main/scripts/举重模拟器.lua"},{name="亡命速递",url="https://raw.githubusercontent.com/GGG792/KaiHubjiaoben/refs/heads/main/scripts/亡命速递.lua"},{name="保护房子不受怪物入侵",url="https://raw.githubusercontent.com/GGG792/KaiHubjiaoben/refs/heads/main/scripts/保护房子不受怪物入侵.lua"},{name="僵尸之塔",url="https://raw.githubusercontent.com/GGG792/KaiHubjiaoben/refs/heads/main/scripts/僵尸之塔.lua"},{name="僵尸生存竞技场",url="https://raw.githubusercontent.com/GGG792/KaiHubjiaoben/refs/heads/main/scripts/僵尸生存竞技场.lua"},{name="克隆王国大亨",url="https://raw.githubusercontent.com/GGG792/KaiHubjiaoben/refs/heads/main/scripts/克隆王国大亨.lua"},{name="决斗场",url="https://raw.githubusercontent.com/GGG792/KaiHubjiaoben/refs/heads/main/scripts/决斗场.lua"},{name="刀刃球",url="https://raw.githubusercontent.com/GGG792/KaiHubjiaoben/refs/heads/main/scripts/刀刃球.lua"},{name="划开大海",url="https://raw.githubusercontent.com/GGG792/KaiHubjiaoben/refs/heads/main/scripts/划开大海.lua"},{name="力量传奇",url="https://raw.githubusercontent.com/GGG792/KaiHubjiaoben/refs/heads/main/scripts/力量传奇.lua"},{name="南极洲探险",url="https://raw.githubusercontent.com/GGG792/KaiHubjiaoben/refs/heads/main/scripts/南极洲探险.lua"},{name="启示录",url="https://raw.githubusercontent.com/GGG792/KaiHubjiaoben/refs/heads/main/scripts/启示录.lua"},{name="奴才大亨",url="https://raw.githubusercontent.com/GGG792/KaiHubjiaoben/refs/heads/main/scripts/奴才大亨.lua"},{name="平滑切片",url="https://raw.githubusercontent.com/GGG792/KaiHubjiaoben/refs/heads/main/scripts/平滑切片.lua"},{name="强壮传奇",url="https://raw.githubusercontent.com/GGG792/KaiHubjiaoben/refs/heads/main/scripts/强壮传奇.lua"},{name="忍者传奇",url="https://raw.githubusercontent.com/GGG792/KaiHubjiaoben/refs/heads/main/scripts/忍者传奇.lua"},{name="戒网瘾中心",url="https://raw.githubusercontent.com/GGG792/KaiHubjiaoben/refs/heads/main/scripts/戒网瘾中心.lua"},{name="手枪竞技场",url="https://raw.githubusercontent.com/GGG792/KaiHubjiaoben/refs/heads/main/scripts/手枪竞技场.lua"},{name="最强战场",url="https://raw.githubusercontent.com/GGG792/KaiHubjiaoben/refs/heads/main/scripts/最强战场.lua"},{name="木筏101天生存",url="https://raw.githubusercontent.com/GGG792/KaiHubjiaoben/refs/heads/main/scripts/木筏101天生存.lua"},{name="极速传奇",url="https://raw.githubusercontent.com/GGG792/KaiHubjiaoben/refs/heads/main/scripts/极速传奇.lua"},{name="模仿者",url="https://raw.githubusercontent.com/GGG792/KaiHubjiaoben/refs/heads/main/scripts/模仿者.lua"},{name="每步+1智商",url="https://raw.githubusercontent.com/GGG792/KaiHubjiaoben/refs/heads/main/scripts/每步+1智商.lua"},{name="汽车经销商大亨",url="https://raw.githubusercontent.com/GGG792/KaiHubjiaoben/refs/heads/main/scripts/汽车经销商大亨.lua"},{name="沉默的刺客",url="https://raw.githubusercontent.com/GGG792/KaiHubjiaoben/refs/heads/main/scripts/沉默的刺客.lua"},{name="滑石头RNG",url="https://raw.githubusercontent.com/GGG792/KaiHubjiaoben/refs/heads/main/scripts/滑石头RNG.lua"},{name="火球训练",url="https://raw.githubusercontent.com/GGG792/KaiHubjiaoben/refs/heads/main/scripts/火球训练.lua"},{name="火箭发射模拟器",url="https://raw.githubusercontent.com/GGG792/KaiHubjiaoben/refs/heads/main/scripts/火箭发射模拟器.lua"},{name="犯罪",url="https://raw.githubusercontent.com/GGG792/KaiHubjiaoben/refs/heads/main/scripts/犯罪.lua"},{name="生存于杀手",url="https://raw.githubusercontent.com/GGG792/KaiHubjiaoben/refs/heads/main/scripts/生存于杀手.lua"},{name="画我",url="https://raw.githubusercontent.com/GGG792/KaiHubjiaoben/refs/heads/main/scripts/画我.lua"},{name="监狱泵",url="https://raw.githubusercontent.com/GGG792/KaiHubjiaoben/refs/heads/main/scripts/监狱泵.lua"},{name="矿井",url="https://raw.githubusercontent.com/GGG792/KaiHubjiaoben/refs/heads/main/scripts/矿井.lua"},{name="砍伐树木",url="https://raw.githubusercontent.com/GGG792/KaiHubjiaoben/refs/heads/main/scripts/砍伐树木.lua"},{name="破坏者谜团2",url="https://raw.githubusercontent.com/GGG792/KaiHubjiaoben/refs/heads/main/scripts/破坏者谜团2.lua"},{name="竞争对手",url="https://raw.githubusercontent.com/GGG792/KaiHubjiaoben/refs/heads/main/scripts/竞争对手.lua"},{name="花园地平线",url="https://raw.githubusercontent.com/GGG792/KaiHubjiaoben/refs/heads/main/scripts/花园地平线.lua"},{name="超真实csgo",url="https://raw.githubusercontent.com/GGG792/KaiHubjiaoben/refs/heads/main/scripts/超真实csgo.lua"},{name="超高速跑者",url="https://raw.githubusercontent.com/GGG792/KaiHubjiaoben/refs/heads/main/scripts/超高速跑者.lua"},{name="迷你帝国",url="https://raw.githubusercontent.com/GGG792/KaiHubjiaoben/refs/heads/main/scripts/迷你帝国.lua"},{name="造船寻宝",url="https://raw.githubusercontent.com/GGG792/KaiHubjiaoben/refs/heads/main/scripts/造船寻宝.lua"},{name="金币点击器",url="https://raw.githubusercontent.com/GGG792/KaiHubjiaoben/refs/heads/main/scripts/金币点击器.lua"},{name="钓鱼模拟器",url="https://raw.githubusercontent.com/GGG792/KaiHubjiaoben/refs/heads/main/scripts/钓鱼模拟器.lua"},{name="闪光",url="https://raw.githubusercontent.com/GGG792/KaiHubjiaoben/refs/heads/main/scripts/闪光.lua"},{name="防御",url="https://raw.githubusercontent.com/GGG792/KaiHubjiaoben/refs/heads/main/scripts/防御.lua"},{name="集装箱RNG",url="https://raw.githubusercontent.com/GGG792/KaiHubjiaoben/refs/heads/main/scripts/集装箱RNG.lua"},{name="餐厅大亨3",url="https://raw.githubusercontent.com/GGG792/KaiHubjiaoben/refs/heads/main/scripts/餐厅大亨3.lua"},{name="鲨鱼咬",url="https://raw.githubusercontent.com/GGG792/KaiHubjiaoben/refs/heads/main/scripts/鲨鱼咬.lua"}};
@@ -2518,6 +2152,31 @@ for _, scriptInfo in ipairs(fscripts) do
 		ChronixUI:Notify({Title="加载脚本",Content=(scriptInfo.name .. " 已加载"),Type="success",Duration=3});
 	end});
 end
+local infoTab = mainWindow:CreateTab({Name="关于",HasIcon=true,IconName="info"});
+infoTab:AddParagraph({Title="关于 KaiHub",Content=("KaiHub - 基于 ChronixHub V3\n\n" .. "主要特性:\n" .. "• 完整的玩家属性修改系统 (移速、跳跃、血量等)\n" .. "• 多种实用工具 (穿墙、无限跳、飞行、透视等)\n" .. "• 支持多种热门游戏的专用功能\n" .. "• 内置音乐播放器和音频检查器\n" .. "• 脚本中心，集成多个第三方脚本\n" .. "• 玩家传送和路径点系统\n" .. "• 实用的执行器和聊天监控功能\n\n" .. "开发者: Furrycalin\n" .. "版本: V3\n" .. "框架: 基于自定义 ChronixUI 库构建\n\n" .. "注意事项:\n" .. "• 请合理使用各项功能\n" .. "• 部分功能可能在游戏中被检测\n" .. "• 使用前请了解游戏规则\n" .. "\n" .. "🙏 特别鸣谢\n" .. "感谢以下开发者对本项目的贡献与支持（排名不分先后）：\n" .. "Furrycalin/Chronix | 脚本的所有者、主要开发者以及贡献者\n" .. "AI-DeepSeek | 提供代码支持和技术提供以及 README 完善\n" .. "AI-Qwen | 提供代码支持\n" .. "AI-DouBao | 提供代码支持\n" .. "IY | 部分功能代码借鉴、参考以及功能灵感来源\n" .. "K6 | 提供隐身代码支持\n" .. "OrionLib | UI 排版灵感来源\n" .. "Wally's UI Library | UI 排版灵感来源\n" .. "WindUI | 使用了 Icon 库\n" .. "PoppyPlayTime4 | 模拟了通知样式")});
+infoTab:AddDivider();
+local hwidlabel;
+if gethwid then
+	hwidlabel = infoTab:AddLabel(string.format("设备唯一标识码(HWID): %s", maskStringMiddle(gethwid())));
+end
+local rbxactivelabel;
+if isrbxactive then
+	rbxactivelabel = infoTab:AddLabel(string.format("焦点检测: %s", (isrbxactive() and "True") or "False"));
+end
+local pingLabel = infoTab:AddLabel(string.format("网络延迟: %s", math.round(LocalPlayer:GetNetworkPing() * 1000) .. "ms"));
+local memLabel = infoTab:AddLabel(string.format("客户端脚本占用内存: %.2f MB", getMemoryUsage("MB")));
+infoTab:AddButton({Text="强制内存垃圾回收",Callback=function()
+	collectgarbage("collect");
+	ChronixUI:Notify({Title="提示",Content="已进行垃圾回收\n请不要频繁使用，可能会影响性能。",Type="info",Duration=5});
+end});
+infoTab:AddTitle(">广告位招租<");
+infoTab:AddParagraph({Title="YangZhiKa 飞机号",Content="广告位招租\n\nYangZhiKa 飞机号\n要买加 QQ：2490035277\n\nContact to purchase advertising space!"});
+infoTab:AddButton({Text="复制QQ号: 2490035277",Callback=function()
+	pcall(function()
+		setclipboard("2490035277");
+	end);
+	ChronixUI:Notify({Title="已复制",Content="QQ号已复制到剪贴板",Type="success",Duration=2});
+end});
 local settingsContent = mainWindow.SettingsElements;
 if (getfpscap and setfpscap) then
 	settingsContent:AddInput({Label="Roblox - 帧率上限",Placeholder="这里输入你的最大帧率",Default=getfpscap(),Callback=function(text)
@@ -2993,4 +2652,102 @@ pcall(function()
 end);
 _G.ChronixHubisLoaded = true;
 _G.ChronixHubLoading = false;
+pcall(function()
+	local isMobile = UserInputService.TouchEnabled and not UserInputService.MouseEnabled;
+	if not isMobile then
+		return;
+	end
+	local VirtualKeysGui = Instance.new("ScreenGui");
+	VirtualKeysGui.Name = "KaiHubVirtualKeys";
+	VirtualKeysGui.Parent = (gethui and gethui()) or cloneref(game.CoreGui);
+	VirtualKeysGui.ResetOnSpawn = false;
+	VirtualKeysGui.ZIndexBehavior = Enum.ZIndexBehavior.Sibling;
+	VirtualKeysGui.IgnoreGuiInset = true;
+	local keyButtons = {};
+	local keyConfigs = {{name="Ctrl",keyCode=Enum.KeyCode.LeftControl,color=Color3.fromRGB(255, 165, 0)},{name="Shift",keyCode=Enum.KeyCode.LeftShift,color=Color3.fromRGB(0, 200, 255)},{name="Alt",keyCode=Enum.KeyCode.LeftAlt,color=Color3.fromRGB(200, 100, 255)},{name="C",keyCode=Enum.KeyCode.C,color=Color3.fromRGB(255, 200, 0)},{name="E",keyCode=Enum.KeyCode.E,color=Color3.fromRGB(100, 255, 100)},{name="Q",keyCode=Enum.KeyCode.Q,color=Color3.fromRGB(255, 100, 100)},{name="F",keyCode=Enum.KeyCode.F,color=Color3.fromRGB(100, 200, 255)},{name="Z",keyCode=Enum.KeyCode.Z,color=Color3.fromRGB(255, 150, 200)},{name="X",keyCode=Enum.KeyCode.X,color=Color3.fromRGB(200, 200, 100)},{name="Space",keyCode=Enum.KeyCode.Space,color=Color3.fromRGB(0, 255, 150)}};
+	local btnSize = 44;
+	local padding = 6;
+	local cols = 5;
+	local totalWidth = (cols * (btnSize + padding)) - padding;
+	local startX = 10;
+	local startY = 10;
+	for i, cfg in ipairs(keyConfigs) do
+		local row = math.floor((i - 1) / cols);
+		local col = (i - 1) % cols;
+		local btn = Instance.new("TextButton");
+		btn.Name = "VK_" .. cfg.name;
+		btn.Size = UDim2.new(0, btnSize, 0, btnSize);
+		btn.Position = UDim2.new(0, startX + (col * (btnSize + padding)), 0, startY + (row * (btnSize + padding)));
+		btn.BackgroundColor3 = cfg.color;
+		btn.BackgroundTransparency = 0.3;
+		btn.Text = cfg.name;
+		btn.TextColor3 = Color3.fromRGB(255, 255, 255);
+		btn.TextSize = 14;
+		btn.Font = Enum.Font.GothamBold;
+		btn.BorderSizePixel = 0;
+		btn.ZIndex = 100;
+		btn.AutoButtonColor = false;
+		btn.Parent = VirtualKeysGui;
+		local corner = Instance.new("UICorner");
+		corner.CornerRadius = UDim.new(0, 8);
+		corner.Parent = btn;
+		local stroke = Instance.new("UIStroke");
+		stroke.Thickness = 1.5;
+		stroke.Transparency = 0.3;
+		stroke.Color = Color3.fromRGB(255, 255, 255);
+		stroke.Parent = btn;
+		keyButtons[cfg.keyCode] = btn;
+		btn.MouseButton1Down:Connect(function()
+			btn.BackgroundTransparency = 0;
+			btn.Size = UDim2.new(0, btnSize - 4, 0, btnSize - 4);
+			btn.Position = UDim2.new(0, startX + (col * (btnSize + padding)) + 2, 0, startY + (row * (btnSize + padding)) + 2);
+			VirtualInputManager = game:GetService("VirtualInputManager");
+			pcall(function()
+				VirtualInputManager:SendKeyEvent(true, cfg.keyCode, false);
+			end);
+		end);
+		btn.MouseButton1Up:Connect(function()
+			btn.BackgroundTransparency = 0.3;
+			btn.Size = UDim2.new(0, btnSize, 0, btnSize);
+			btn.Position = UDim2.new(0, startX + (col * (btnSize + padding)), 0, startY + (row * (btnSize + padding)));
+			pcall(function()
+				game:GetService("VirtualInputManager"):SendKeyEvent(false, cfg.keyCode, false);
+			end);
+		end);
+		btn.MouseLeave:Connect(function()
+			btn.BackgroundTransparency = 0.3;
+			btn.Size = UDim2.new(0, btnSize, 0, btnSize);
+			btn.Position = UDim2.new(0, startX + (col * (btnSize + padding)), 0, startY + (row * (btnSize + padding)));
+			pcall(function()
+				game:GetService("VirtualInputManager"):SendKeyEvent(false, cfg.keyCode, false);
+			end);
+		end);
+	end
+	local toggleBtn = Instance.new("TextButton");
+	toggleBtn.Name = "ToggleVK";
+	toggleBtn.Size = UDim2.new(0, 36, 0, 36);
+	toggleBtn.Position = UDim2.new(0, startX, 0, startY);
+	toggleBtn.BackgroundColor3 = Color3.fromRGB(119, 221, 255);
+	toggleBtn.BackgroundTransparency = 0.2;
+	toggleBtn.Text = "⌨";
+	toggleBtn.TextColor3 = Color3.fromRGB(0, 0, 0);
+	toggleBtn.TextSize = 18;
+	toggleBtn.Font = Enum.Font.GothamBold;
+	toggleBtn.BorderSizePixel = 0;
+	toggleBtn.ZIndex = 101;
+	toggleBtn.AutoButtonColor = false;
+	toggleBtn.Parent = VirtualKeysGui;
+	local toggleCorner = Instance.new("UICorner");
+	toggleCorner.CornerRadius = UDim.new(0, 8);
+	toggleCorner.Parent = toggleBtn;
+	local vkVisible = true;
+	toggleBtn.MouseButton1Click:Connect(function()
+		vkVisible = not vkVisible;
+		for _, btn in pairs(keyButtons) do
+			btn.Visible = vkVisible;
+		end
+		toggleBtn.Text = (vkVisible and "⌨") or "⌨";
+		toggleBtn.BackgroundTransparency = (vkVisible and 0.2) or 0.5;
+	end);
+end);
 loadingTimedOut = true;
