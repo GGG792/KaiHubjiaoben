@@ -832,22 +832,30 @@ ToolsTab:AddToggle({Label="雾气去除",Default=false,Callback=function(v)
 		RestoreFog();
 	end
 end});
-local xrayLoop;
+local xrayLoop = nil;
 ToolsTab:AddToggle({Label="X光",Default=false,Callback=function(v)
 	data['basicdata']['releasetools']['xray'] = v;
 	if v then
-		pcall(function()
-			xrayLoop:Disconnect();
-		end);
-		xrayLoop = RunService.RenderStepped:Connect(function()
-			xray(data['basicdata']['releasetools']['xray']);
-			task.wait(1);
+		if xrayLoop then xrayLoop:Disconnect() end;
+		xray(true);
+		xrayLoop = task.spawn(function()
+			while data['basicdata']['releasetools']['xray'] do
+				task.wait(2);
+				if data['basicdata']['releasetools']['xray'] then
+					xray(true);
+				end
+			end
 		end);
 	else
-		pcall(function()
-			xrayLoop:Disconnect();
-		end);
-		xray(data['basicdata']['releasetools']['xray']);
+		if xrayLoop then
+			if typeof(xrayLoop) == "thread" then
+				-- task.spawn 返回的线程无法直接断开，靠循环条件退出
+			else
+				xrayLoop:Disconnect();
+			end
+			xrayLoop = nil;
+		end
+		xray(false);
 	end
 end});
 ToolsTab:AddToggle({Label="显示隐藏部件",Default=false,Callback=function(v)
@@ -878,32 +886,40 @@ ToolsTab:AddToggle({Label="瞬间交互",Default=false,Callback=function(v)
 		InstantInteraction.disable();
 	end
 end});
+local noclipConnection = nil;
 ToolsTab:AddToggle({Label="穿墙",Default=false,Callback=function(v)
 	data['basicdata']['releasetools']['noclip'] = v;
-	Stepped = RunService.Stepped:Connect(function()
-		if data['basicdata']['releasetools']['noclip'] then
-			for a, b in pairs(Workspace:GetChildren()) do
-				if (b.Name == LocalPlayer.Name) then
-					for i, v in pairs(Workspace[LocalPlayer.Name]:GetChildren()) do
-						if v:IsA("BasePart") then
-							v.CanCollide = false;
-						end
+	if v then
+		if noclipConnection then noclipConnection:Disconnect() end;
+		noclipConnection = RunService.Stepped:Connect(function()
+			if not data['basicdata']['releasetools']['noclip'] then
+				noclipConnection:Disconnect();
+				noclipConnection = nil;
+				return;
+			end
+			local char = LocalPlayer.Character;
+			if char then
+				for _, part in ipairs(char:GetDescendants()) do
+					if part:IsA("BasePart") then
+						part.CanCollide = false;
 					end
 				end
 			end
-		else
-			for a, b in pairs(Workspace:GetChildren()) do
-				if (b.Name == LocalPlayer.Name) then
-					for i, v in pairs(Workspace[LocalPlayer.Name]:GetChildren()) do
-						if v:IsA("BasePart") then
-							v.CanCollide = true;
-						end
-					end
-				end
-			end
-			Stepped:Disconnect();
+		end);
+	else
+		if noclipConnection then
+			noclipConnection:Disconnect();
+			noclipConnection = nil;
 		end
-	end);
+		local char = LocalPlayer.Character;
+		if char then
+			for _, part in ipairs(char:GetDescendants()) do
+				if part:IsA("BasePart") then
+					part.CanCollide = true;
+				end
+			end
+		end
+	end
 end});
 ToolsTab:AddToggle({Label="连跳",Default=false,Callback=function(v)
 	data['basicdata']['releasetools']['infjump'] = v;
