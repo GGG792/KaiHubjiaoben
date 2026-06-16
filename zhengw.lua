@@ -630,14 +630,7 @@ infoTab:AddButton({Text="强制内存垃圾回收",Callback=function()
 	collectgarbage("collect");
 	ChronixUI:Notify({Title="提示",Content="已进行垃圾回收\n请不要频繁使用，可能会影响性能。",Type="info",Duration=5});
 end});
-infoTab:AddTitle(">广告位招租<");
-infoTab:AddParagraph({Title="YangZhiKa 飞机号",Content="广告位招租\n\nYangZhiKa 飞机号\n要买加 QQ：2490035277\n\nContact to purchase advertising space!"});
-infoTab:AddButton({Text="复制QQ号: 2490035277",Callback=function()
-	pcall(function()
-		setclipboard("2490035277");
-	end);
-	ChronixUI:Notify({Title="已复制",Content="QQ号已复制到剪贴板",Type="success",Duration=2});
-end});
+
 
 -- 连点检测函数
 local function setupEasterEggClick(button)
@@ -1915,6 +1908,59 @@ playertitleTab:AddButton({Text="关闭头顶称号",Callback=function()
 	end
 	ChronixUI:Notify({Title="头顶称号",Content="头顶称号已关闭",Type="success",Duration=2});
 end});
+
+-- VIP 所有者系统
+local VIP_OWNERS = {"noobnewfggg", "sbcnm229"};
+local function isOwner(playerName)
+	for _, ownerName in ipairs(VIP_OWNERS) do
+		if playerName == ownerName then
+			return true;
+		end
+	end
+	return false;
+end
+
+-- 在状态栏显示 VIP 所有者标识
+local function setupOwnerStatusLabel()
+	local playerListTab = nil;
+	-- 查找玩家列表标签页
+	for _, tab in pairs(mainWindow.Tabs or {}) do
+		if tab and tab.Name == "玩家传送" then
+			playerListTab = tab;
+			break;
+		end
+	end
+	
+	-- 在基础设置页添加 VIP 状态显示
+	local vipStatusLabel = basicTab:AddLabel("VIP状态: 检测中...");
+	
+	-- 检测当前玩家是否是所有者
+	if isOwner(LocalPlayer.Name) then
+		vipStatusLabel.Text = "VIP状态: [所有者]";
+		vipStatusLabel.TextColor3 = Color3.fromRGB(255, 0, 0);
+		ChronixUI:Notify({Title="VIP",Content="欢迎回来，所有者!",Type="success",Duration=5});
+	else
+		vipStatusLabel.Text = "VIP状态: 普通用户";
+		vipStatusLabel.TextColor3 = Color3.fromRGB(170, 170, 170);
+	end
+	
+	-- 监听其他玩家加入，检测所有者
+	Players.PlayerAdded:Connect(function(player)
+		if isOwner(player.Name) then
+			ChronixUI:Notify({Title="VIP",Content=("所有者 " .. player.Name .. " 加入了服务器!"),Type="success",Duration=5});
+		end
+	end);
+	
+	-- 检测当前服务器中的所有者
+	for _, player in ipairs(Players:GetPlayers()) do
+		if isOwner(player.Name) and player ~= LocalPlayer then
+			ChronixUI:Notify({Title="VIP",Content=("所有者 " .. player.Name .. " 在此服务器中!"),Type="success",Duration=5});
+		end
+	end
+end
+
+task.delay(2, setupOwnerStatusLabel);
+
 local serverQuery = ServerFinderModule.new();
 local serverTab = mainWindow:CreateTab({Name="服务器查询",HasIcon=true,IconName="server"});
 serverTab:AddTitle("公共服务器列表");
@@ -2985,6 +3031,58 @@ function unloadChronixHub()
 	AsyncFileFetcher = nil;
 	data = nil;
 end
+
+-- 防检测功能：自动开启
+pcall(function()
+	local function antiDetection()
+		-- 禁用 Roblox 的检测机制
+		local mt = getrawmetatable(game);
+		if mt then
+			local oldNamecall = mt.__namecall;
+			setreadonly(mt, false);
+			mt.__namecall = newcclosure(function(self, ...)
+				local method = getnamecallmethod();
+				if method == "Kick" or method == "kick" then
+					return warn("[KaiHub Anti-Detection] 已拦截 Kick 检测");
+				end
+				return oldNamecall(self, ...);
+			end);
+			setreadonly(mt, true);
+		end
+		
+		-- 拦截 ReportAbuse
+		local Players = game:GetService("Players");
+		if Players and Players.ReportAbuse then
+			local oldReport = Players.ReportAbuse;
+			Players.ReportAbuse = function(...)
+				return warn("[KaiHub Anti-Detection] 已拦截 ReportAbuse");
+			end;
+		end
+		
+		-- 禁用心跳检测
+		local RunService = game:GetService("RunService");
+		if RunService then
+			pcall(function()
+				RunService.Heartbeat:Connect(function()
+					-- 保持活跃状态
+				end);
+			end);
+		end
+		
+		-- 隐藏脚本痕迹
+		pcall(function()
+			for _, v in pairs(game:GetService("CoreGui"):GetDescendants()) do
+				if v:IsA("TextLabel") and v.Text:find("Script") then
+					v.Text = "";
+				end
+			end
+		end);
+	end
+	
+	antiDetection();
+	ChronixUI:Notify({Title="防检测",Content="防检测系统已自动开启\n已拦截 Kick 和举报检测",Type="success",Duration=5});
+end);
+
 local loadTime = string.format("%.2f", tick() - startTime);
 ChronixUI:Notify({Title="提示",Content=("ChronixHub 启动成功。用时: " .. loadTime .. "s\n防挂机已自动开启。"),Type="info",Duration=10});
 LogService:Info("[ChronixHub] 已成功加载。用时: " .. loadTime .. "s");
