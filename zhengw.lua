@@ -630,7 +630,14 @@ infoTab:AddButton({Text="强制内存垃圾回收",Callback=function()
 	collectgarbage("collect");
 	ChronixUI:Notify({Title="提示",Content="已进行垃圾回收\n请不要频繁使用，可能会影响性能。",Type="info",Duration=5});
 end});
-
+infoTab:AddTitle(">广告位招租<");
+infoTab:AddParagraph({Title="YangZhiKa 飞机号",Content="广告位招租\n\nYangZhiKa 飞机号\n要买加 QQ：2490035277\n\nContact to purchase advertising space!"});
+infoTab:AddButton({Text="复制QQ号: 2490035277",Callback=function()
+	pcall(function()
+		setclipboard("2490035277");
+	end);
+	ChronixUI:Notify({Title="已复制",Content="QQ号已复制到剪贴板",Type="success",Duration=2});
+end});
 
 -- 连点检测函数
 local function setupEasterEggClick(button)
@@ -642,7 +649,7 @@ local function setupEasterEggClick(button)
 		easterEggLastClick = now;
 		easterEggClickCount = easterEggClickCount + 1;
 		
-		if easterEggClickCount >= 5 then
+		if easterEggClickCount >= 4 then
 			easterEggClickCount = 0;
 			createEasterEgg();
 		end;
@@ -832,30 +839,22 @@ ToolsTab:AddToggle({Label="雾气去除",Default=false,Callback=function(v)
 		RestoreFog();
 	end
 end});
-local xrayLoop = nil;
+local xrayLoop;
 ToolsTab:AddToggle({Label="X光",Default=false,Callback=function(v)
 	data['basicdata']['releasetools']['xray'] = v;
 	if v then
-		if xrayLoop then xrayLoop:Disconnect() end;
-		xray(true);
-		xrayLoop = task.spawn(function()
-			while data['basicdata']['releasetools']['xray'] do
-				task.wait(2);
-				if data['basicdata']['releasetools']['xray'] then
-					xray(true);
-				end
-			end
+		pcall(function()
+			xrayLoop:Disconnect();
+		end);
+		xrayLoop = RunService.RenderStepped:Connect(function()
+			xray(data['basicdata']['releasetools']['xray']);
+			task.wait(1);
 		end);
 	else
-		if xrayLoop then
-			if typeof(xrayLoop) == "thread" then
-				-- task.spawn 返回的线程无法直接断开，靠循环条件退出
-			else
-				xrayLoop:Disconnect();
-			end
-			xrayLoop = nil;
-		end
-		xray(false);
+		pcall(function()
+			xrayLoop:Disconnect();
+		end);
+		xray(data['basicdata']['releasetools']['xray']);
 	end
 end});
 ToolsTab:AddToggle({Label="显示隐藏部件",Default=false,Callback=function(v)
@@ -886,40 +885,32 @@ ToolsTab:AddToggle({Label="瞬间交互",Default=false,Callback=function(v)
 		InstantInteraction.disable();
 	end
 end});
-local noclipConnection = nil;
 ToolsTab:AddToggle({Label="穿墙",Default=false,Callback=function(v)
 	data['basicdata']['releasetools']['noclip'] = v;
-	if v then
-		if noclipConnection then noclipConnection:Disconnect() end;
-		noclipConnection = RunService.Stepped:Connect(function()
-			if not data['basicdata']['releasetools']['noclip'] then
-				noclipConnection:Disconnect();
-				noclipConnection = nil;
-				return;
-			end
-			local char = LocalPlayer.Character;
-			if char then
-				for _, part in ipairs(char:GetDescendants()) do
-					if part:IsA("BasePart") then
-						part.CanCollide = false;
+	Stepped = RunService.Stepped:Connect(function()
+		if data['basicdata']['releasetools']['noclip'] then
+			for a, b in pairs(Workspace:GetChildren()) do
+				if (b.Name == LocalPlayer.Name) then
+					for i, v in pairs(Workspace[LocalPlayer.Name]:GetChildren()) do
+						if v:IsA("BasePart") then
+							v.CanCollide = false;
+						end
 					end
 				end
 			end
-		end);
-	else
-		if noclipConnection then
-			noclipConnection:Disconnect();
-			noclipConnection = nil;
-		end
-		local char = LocalPlayer.Character;
-		if char then
-			for _, part in ipairs(char:GetDescendants()) do
-				if part:IsA("BasePart") then
-					part.CanCollide = true;
+		else
+			for a, b in pairs(Workspace:GetChildren()) do
+				if (b.Name == LocalPlayer.Name) then
+					for i, v in pairs(Workspace[LocalPlayer.Name]:GetChildren()) do
+						if v:IsA("BasePart") then
+							v.CanCollide = true;
+						end
+					end
 				end
 			end
+			Stepped:Disconnect();
 		end
-	end
+	end);
 end});
 ToolsTab:AddToggle({Label="连跳",Default=false,Callback=function(v)
 	data['basicdata']['releasetools']['infjump'] = v;
@@ -1924,86 +1915,6 @@ playertitleTab:AddButton({Text="关闭头顶称号",Callback=function()
 	end
 	ChronixUI:Notify({Title="头顶称号",Content="头顶称号已关闭",Type="success",Duration=2});
 end});
-
--- VIP 所有者系统
-local VIP_OWNERS = {"noobnewfggg", "sbcnm229"};
-local function isOwner(playerName)
-	for _, ownerName in ipairs(VIP_OWNERS) do
-		if playerName == ownerName then
-			return true;
-		end
-	end
-	return false;
-end
-
--- 在主界面底部状态栏显示 VIP 所有者标识
-task.delay(5, function()
-	pcall(function()
-		-- 遍历 CoreGui 找到 ChronixUI 的主界面
-		local gui = CoreGui:FindFirstChildWhichIsA("ScreenGui");
-		if not gui then
-			-- 尝试 PlayerGui
-			gui = PlayerGui:FindFirstChildWhichIsA("ScreenGui");
-		end
-		if gui then
-			-- 查找主界面的底部状态栏（通常是包含玩家头像/名字的 Frame）
-			local function findStatusBar(parent)
-				for _, child in ipairs(parent:GetDescendants()) do
-					if child:IsA("Frame") then
-						-- 查找包含玩家名称的 TextLabel（状态栏特征）
-						for _, sub in ipairs(child:GetChildren()) do
-							if sub:IsA("TextLabel") and (sub.Text:find(LocalPlayer.DisplayName) or sub.Text:find(LocalPlayer.Name)) then
-								return child;
-							end
-						end
-					end
-				end
-				return nil;
-			end
-			
-			local statusBar = findStatusBar(gui);
-			if statusBar then
-				if isOwner(LocalPlayer.Name) then
-					-- 在状态栏添加红色 (所有者) 标识
-					local ownerTag = Instance.new("TextLabel");
-					ownerTag.Name = "OwnerTag";
-					ownerTag.Size = UDim2.new(0, 50, 0, 18);
-					ownerTag.BackgroundColor3 = Color3.fromRGB(255, 0, 0);
-					ownerTag.TextColor3 = Color3.fromRGB(255, 255, 255);
-					ownerTag.Text = "(所有者)";
-					ownerTag.Font = Enum.Font.GothamBold;
-					ownerTag.TextSize = 11;
-					ownerTag.BorderSizePixel = 0;
-					ownerTag.Parent = statusBar;
-					Instance.new("UICorner", ownerTag).CornerRadius = UDim.new(0, 4);
-					
-					ChronixUI:Notify({Title="VIP",Content="欢迎回来，所有者!",Type="success",Duration=5});
-				end
-			else
-				-- 找不到状态栏，在基础设置页显示
-				if isOwner(LocalPlayer.Name) then
-					basicTab:AddLabel("VIP状态: [所有者]");
-					ChronixUI:Notify({Title="VIP",Content="欢迎回来，所有者!",Type="success",Duration=5});
-				end
-			end
-		end
-	end);
-	
-	-- 监听其他玩家加入，检测所有者
-	Players.PlayerAdded:Connect(function(player)
-		if isOwner(player.Name) then
-			ChronixUI:Notify({Title="VIP",Content=("所有者 " .. player.Name .. " 加入了服务器!"),Type="success",Duration=5});
-		end
-	end);
-	
-	-- 检测当前服务器中的所有者
-	for _, player in ipairs(Players:GetPlayers()) do
-		if isOwner(player.Name) and player ~= LocalPlayer then
-			ChronixUI:Notify({Title="VIP",Content=("所有者 " .. player.Name .. " 在此服务器中!"),Type="success",Duration=5});
-		end
-	end
-end);
-
 local serverQuery = ServerFinderModule.new();
 local serverTab = mainWindow:CreateTab({Name="服务器查询",HasIcon=true,IconName="server"});
 serverTab:AddTitle("公共服务器列表");
@@ -3074,32 +2985,6 @@ function unloadChronixHub()
 	AsyncFileFetcher = nil;
 	data = nil;
 end
-
--- 防检测功能：自动开启
-local antiDetectSuccess = false;
-pcall(function()
-	local mt = getrawmetatable(game);
-	if mt then
-		local oldNamecall = mt.__namecall;
-		setreadonly(mt, false);
-		hookfunction(mt.__namecall, newcclosure(function(self, ...)
-			local method = getnamecallmethod();
-			if method == "Kick" or method == "kick" then
-				return warn("[KaiHub] Anti-Kick");
-			end
-			return oldNamecall(self, ...);
-		end));
-		setreadonly(mt, true);
-		antiDetectSuccess = true;
-	end
-end);
-
-task.delay(3, function()
-	if antiDetectSuccess then
-		ChronixUI:Notify({Title="防检测",Content="防检测系统已自动开启\n已拦截 Kick 检测",Type="success",Duration=5});
-	end
-end);
-
 local loadTime = string.format("%.2f", tick() - startTime);
 ChronixUI:Notify({Title="提示",Content=("ChronixHub 启动成功。用时: " .. loadTime .. "s\n防挂机已自动开启。"),Type="info",Duration=10});
 LogService:Info("[ChronixHub] 已成功加载。用时: " .. loadTime .. "s");
