@@ -5,7 +5,12 @@ local TweenService = game:GetService("TweenService");
 local UserInputService = game:GetService("UserInputService");
 local Lighting = game:GetService("Lighting");
 local Camera = workspace.CurrentCamera;
-local MAIN_URL = "https://raw.kkgithub.com/GGG792/KaiHubjiaoben/refs/heads/main/zhengw.lua";
+local MAIN_URLS = {
+	"https://raw.githubusercontent.com/GGG792/KaiHubjiaoben/refs/heads/main/zhengw.lua",
+	"https://raw.kkgithub.com/GGG792/KaiHubjiaoben/refs/heads/main/zhengw.lua",
+	"https://ghproxy.com/https://raw.githubusercontent.com/GGG792/KaiHubjiaoben/refs/heads/main/zhengw.lua",
+	"https://mirror.ghproxy.com/https://raw.githubusercontent.com/GGG792/KaiHubjiaoben/refs/heads/main/zhengw.lua"
+};
 local THEME = {Background=Color3.fromRGB(30, 30, 46),Sidebar=Color3.fromRGB(24, 24, 37),Accent=Color3.fromRGB(119, 221, 255),Text=Color3.fromRGB(255, 255, 255),TextDark=Color3.fromRGB(170, 170, 170),Border=Color3.fromRGB(44, 44, 62),Card=Color3.fromRGB(37, 37, 53),Hover=Color3.fromRGB(45, 45, 65),Success=Color3.fromRGB(46, 213, 115),Error=Color3.fromRGB(255, 71, 87)};
 local screenSize = Camera.ViewportSize;
 local isMobile = UserInputService.TouchEnabled and not UserInputService.MouseEnabled;
@@ -330,11 +335,26 @@ StartBtn.MouseButton1Click:Connect(function()
 	StartBtn.BackgroundColor3 = Color3.fromRGB(80, 80, 90);
 	BtnStroke.Color = Color3.fromRGB(150, 150, 150);
 	local success, err = pcall(function()
-		local code = game:HttpGet(MAIN_URL);
-		if (code and (#code > 100)) then
+		local code = nil;
+		local lastErr = "";
+		-- 尝试多个镜像
+		for _, url in ipairs(MAIN_URLS) do
+			local ok, result = pcall(function()
+				return game:HttpGet(url);
+			end);
+			if ok and result and #result > 100 then
+				code = result;
+				break;
+			elseif ok then
+				lastErr = "返回内容过短";
+			else
+				lastErr = tostring(result):sub(1, 30);
+			end
+		end
+		if code then
 			loadstring(code)();
 		else
-			error("获取脚本失败，返回内容过短");
+			error("所有镜像均失败: " .. lastErr);
 		end
 	end);
 	if not success then
