@@ -163,7 +163,7 @@ local function makeLabel(props)
 	lbl.BackgroundTransparency = 1;
 	lbl.TextXAlignment = Enum.TextXAlignment.Center;
 	lbl.TextYAlignment = Enum.TextYAlignment.Center;
-	lbl.Font = Enum.Font.GothamBlack;
+	lbl.Font = Enum.Font.ArialBold;
 	lbl.TextTransparency = 1;
 	for k, v in pairs(props) do lbl[k] = v; end;
 	return lbl;
@@ -223,7 +223,7 @@ local YangAuthor = makeLabel({
 	Position = UDim2.new(0.5, 0, 0.5, 38);
 	Size = UDim2.new(0, 130, 0, 26);
 	TextSize = 18;
-	Font = Enum.Font.GothamBold;
+	Font = Enum.Font.ArialBold;
 	Text = "(作者)";
 	TextColor3 = Color3.fromRGB(255, 255, 255);
 	Parent = Center;
@@ -255,7 +255,7 @@ local LoadTxt = makeLabel({
 	Position = UDim2.new(0.5, 0, 0.73, 0);
 	Size = UDim2.new(0, 300, 0, 28);
 	TextSize = 15;
-	Font = Enum.Font.GothamMedium;
+	Font = Enum.Font.Arial;
 	Text = "";
 	TextColor3 = ACCENT;
 	Parent = Center;
