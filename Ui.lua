@@ -524,6 +524,84 @@ task.delay(0.8, function()
 	end);
 end);
 
+-- ========== 使用统计 ==========
+local StatsGui = nil;
+local startTime = tick();
+local launchCount = 0;
+
+pcall(function()
+	local saved = game:GetService("HttpService"):JSONDecode(readfile("KaiHub_stats.json"));
+	launchCount = (saved.count or 0) + 1;
+end);
+
+pcall(function()
+	writefile("KaiHub_stats.json", game:GetService("HttpService"):JSONEncode({count=launchCount, last=os.time()}));
+end);
+
+local function showStatsBar()
+	StatsGui = Instance.new("ScreenGui");
+	StatsGui.Name = "KaiHubStats";
+	StatsGui.Parent = LocalPlayer.PlayerGui;
+	StatsGui.ResetOnSpawn = false;
+	StatsGui.ZIndexBehavior = Enum.ZIndexBehavior.Sibling;
+	
+	local bar = Instance.new("Frame");
+	bar.Size = UDim2.new(1, 0, 0, 22);
+	bar.Position = UDim2.new(0, 0, 0, 0);
+	bar.BackgroundColor3 = Color3.fromRGB(20, 20, 30);
+	bar.BackgroundTransparency = 0.15;
+	bar.BorderSizePixel = 0;
+	bar.Parent = StatsGui;
+	
+	local stroke = Instance.new("UIStroke");
+	stroke.Thickness = 1;
+	stroke.Color = isOwner and Color3.fromRGB(255, 180, 0) or Color3.fromRGB(80, 80, 120);
+	stroke.Transparency = 0.5;
+	stroke.Parent = bar;
+	
+	local left = Instance.new("TextLabel");
+	left.Size = UDim2.new(0.5, -10, 1, 0);
+	left.Position = UDim2.new(0, 10, 0, 0);
+	left.BackgroundTransparency = 1;
+	left.Text = " Launches: " .. launchCount;
+	left.Font = Enum.Font.SourceSansBold;
+	left.TextSize = 13;
+	left.TextColor3 = isOwner and Color3.fromRGB(255, 200, 0) or Color3.fromRGB(150, 200, 255);
+	left.TextXAlignment = Enum.TextXAlignment.Left;
+	left.TextYAlignment = Enum.TextYAlignment.Center;
+	left.Parent = bar;
+	
+	local right = Instance.new("TextLabel");
+	right.Size = UDim2.new(0.5, -10, 1, 0);
+	right.Position = UDim2.new(0.5, 0, 0, 0);
+	right.BackgroundTransparency = 1;
+	right.Text = "Session: 00:00:00 ";
+	right.Font = Enum.Font.SourceSansBold;
+	right.TextSize = 13;
+	right.TextColor3 = isOwner and Color3.fromRGB(255, 200, 0) or Color3.fromRGB(150, 200, 255);
+	right.TextXAlignment = Enum.TextXAlignment.Right;
+	right.TextYAlignment = Enum.TextYAlignment.Center;
+	right.Parent = bar;
+	
+	-- 计时器
+	task.spawn(function()
+		while StatsGui and StatsGui.Parent do
+			task.wait(1);
+			pcall(function()
+				local elapsed = tick() - startTime;
+				local h = math.floor(elapsed / 3600);
+				local m = math.floor((elapsed % 3600) / 60);
+				local s = math.floor(elapsed % 60);
+				right.Text = string.format(" Session: %02d:%02d:%02d ", h, m, s);
+			end);
+		end;
+	end);
+	
+	-- 入场动画
+	bar.Position = UDim2.new(0, 0, 0, -22);
+	TweenService:Create(bar, TweenInfo.new(0.4, Enum.EasingStyle.Back), {Position=UDim2.new(0,0,0,0)}):Play();
+end;
+
 -- ========== 启动脚本 ==========
 function doLaunch()
 	local ok, err = pcall(function()
@@ -540,6 +618,8 @@ function doLaunch()
 		LoadTxt.TextColor3 = Color3.fromRGB(255, 71, 87);
 		task.delay(4, fadeOut);
 	else
-		fadeOut();
+		fadeOut(function()
+			task.delay(0.5, showStatsBar);
+		end);
 	end;
 end;
