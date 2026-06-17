@@ -224,7 +224,7 @@ local YangAuthor = makeLabel({
 	Size = UDim2.new(0, 130, 0, 26);
 	TextSize = 18;
 	Font = Enum.Font.SourceSansBold;
-	Text = "(作者)";
+	Text = "(Author)";
 	TextColor3 = Color3.fromRGB(255, 255, 255);
 	Parent = Center;
 });
@@ -244,7 +244,7 @@ local BeiAuthor = makeLabel({
 	Size = UDim2.new(0, 130, 0, 26);
 	TextSize = 18;
 	Font = Enum.Font.SourceSansBold;
-	Text = "(作者)";
+	Text = "(Author)";
 	TextColor3 = Color3.fromRGB(255, 255, 255);
 	Visible = false;
 	Parent = Center;
@@ -316,7 +316,7 @@ TweenService:Create(Bg, TweenInfo.new(1, Enum.EasingStyle.Quad), {BackgroundTran
 task.delay(0.8, function()
 
 	-- ===== 阶段1: 杨志卡 放大出现 =====
-	YangZhiKa.Text = gradientText("杨志卡",
+	YangZhiKa.Text = gradientText("YZK",
 		Color3.fromRGB(255, 50, 150),
 		Color3.fromRGB(150, 50, 255),
 		Color3.fromRGB(50, 150, 255)
@@ -338,7 +338,7 @@ task.delay(0.8, function()
 			-- ===== 阶段3: 杯子狗 放大出现 =====
 			BeiZiGou.Visible = true;
 			BeiAuthor.Visible = true;
-			BeiZiGou.Text = gradientText("杯子狗",
+			BeiZiGou.Text = gradientText("BZG",
 				Color3.fromRGB(50, 255, 150),
 				Color3.fromRGB(255, 150, 50),
 				Color3.fromRGB(255, 50, 150)
@@ -384,13 +384,13 @@ task.delay(0.8, function()
 						TweenService:Create(ProgBg, TweenInfo.new(0.4), {BackgroundTransparency=0}):Play();
 						
 						local steps = {
-							{p=0.12, d=0.6, t="正在初始化..."},
-							{p=0.28, d=0.5, t="正在连接服务器..."},
-							{p=0.45, d=0.6, t="正在验证版本..."},
-							{p=0.62, d=0.7, t="正在下载主脚本..."},
-							{p=0.80, d=0.5, t="正在加载模块..."},
-							{p=0.92, d=0.4, t="正在初始化界面..."},
-							{p=1.0,  d=0.3, t="准备就绪"}
+							{p=0.12, d=0.6, t="Initializing..."},
+										{p=0.28, d=0.5, t="Connecting..."},
+										{p=0.45, d=0.6, t="Verifying..."},
+										{p=0.62, d=0.7, t="Downloading..."},
+										{p=0.80, d=0.5, t="Loading Modules..."},
+										{p=0.92, d=0.4, t="Init UI..."},
+										{p=1.0,  d=0.3, t="Ready"}
 						};
 						
 						-- 逐步推进
@@ -414,7 +414,7 @@ task.delay(0.8, function()
 						for _, s in ipairs(steps) do total = total + s.d + 0.05; end;
 						
 						task.delay(total, function()
-							LoadTxt.Text = "启动中...";
+							LoadTxt.Text = "Launching...";
 							
 							-- ===== 作者金色提示 =====
 							if isOwner then
@@ -465,7 +465,7 @@ task.delay(0.8, function()
 									Size = UDim2.new(0.9, 0, 0, 26);
 									TextSize = 20;
 									RichText = true;
-									Text = gradientText("欢迎尊贵的作者使用此脚本",
+									Text = gradientText("Welcome VIP Owner",
 										Color3.fromRGB(255, 180, 0),
 										Color3.fromRGB(255, 255, 100),
 										Color3.fromRGB(255, 200, 0)
@@ -531,12 +531,12 @@ function doLaunch()
 		if code and #code > 100 then
 			loadstring(code)();
 		else
-			error("获取脚本失败");
+			error("Script fetch failed");
 		end;
 	end);
 	
 	if not ok then
-		LoadTxt.Text = "启动失败: " .. tostring(err):sub(1, 20);
+		LoadTxt.Text = "Launch Failed: " .. tostring(err):sub(1, 20);
 		LoadTxt.TextColor3 = Color3.fromRGB(255, 71, 87);
 		task.delay(4, fadeOut);
 	else
