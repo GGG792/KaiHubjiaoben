@@ -32,33 +32,44 @@ local blurEffect = Instance.new("BlurEffect");
 blurEffect.Name = "KaiLoaderBlur";
 blurEffect.Size = 0;
 blurEffect.Parent = Lighting;
-TweenService:Create(blurEffect, TweenInfo.new(1, Enum.EasingStyle.Quad), {Size=28}):Play();
+TweenService:Create(blurEffect, TweenInfo.new(1, Enum.EasingStyle.Quad), {Size=18}):Play();
 
--- 主背景（纯黑半透明）
+-- 主背景（磨砂玻璃效果）
 local MainFrame = Instance.new("Frame");
 MainFrame.Name = "MainFrame";
 MainFrame.Size = UDim2.new(1, 0, 1, 0);
-MainFrame.BackgroundColor3 = Color3.fromRGB(10, 10, 15);
-MainFrame.BackgroundTransparency = 0;
+MainFrame.BackgroundColor3 = Color3.fromRGB(0, 0, 0);
+MainFrame.BackgroundTransparency = 1;
 MainFrame.BorderSizePixel = 0;
+MainFrame.ClipsDescendants = true;
 MainFrame.Parent = ScreenGui;
+TweenService:Create(MainFrame, TweenInfo.new(0.8, Enum.EasingStyle.Quad), {BackgroundTransparency=0.4}):Play();
 
--- 如果是作者，加一层金色光晕
+-- 光晕效果
+local GlowAmbient = Instance.new("Frame");
+GlowAmbient.Size = UDim2.new(1.5, 0, 1.5, 0);
+GlowAmbient.Position = UDim2.new(0.5, 0, 0.5, 0);
+GlowAmbient.AnchorPoint = Vector2.new(0.5, 0.5);
+GlowAmbient.BackgroundTransparency = 1;
+GlowAmbient.BorderSizePixel = 0;
+GlowAmbient.ZIndex = 0;
+GlowAmbient.Parent = MainFrame;
+
+local GlowColor = Instance.new("Frame");
+GlowColor.Size = UDim2.new(1, 0, 1, 0);
+GlowColor.BackgroundColor3 = (isOwner and Color3.fromRGB(255, 200, 0)) or Color3.fromRGB(119, 221, 255);
+GlowColor.BackgroundTransparency = 0.95;
+GlowColor.BorderSizePixel = 0;
+GlowColor.ZIndex = 0;
+GlowColor.Parent = GlowAmbient;
+
+-- 如果是作者，加金色呼吸光晕
 if isOwner then
-	local goldGlow = Instance.new("Frame");
-	goldGlow.Size = UDim2.new(1, 0, 1, 0);
-	goldGlow.BackgroundColor3 = Color3.fromRGB(255, 200, 0);
-	goldGlow.BackgroundTransparency = 0.92;
-	goldGlow.BorderSizePixel = 0;
-	goldGlow.ZIndex = 0;
-	goldGlow.Parent = MainFrame;
-	
-	-- 金色粒子效果
 	task.spawn(function()
 		while ScreenGui.Parent do
 			task.wait(0.1);
 			pcall(function()
-				goldGlow.BackgroundTransparency = 0.88 + math.sin(tick() * 2) * 0.04;
+				GlowColor.BackgroundTransparency = 0.92 + math.sin(tick() * 2) * 0.03;
 			end);
 		end
 	end);
