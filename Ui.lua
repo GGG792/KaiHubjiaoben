@@ -2,6 +2,7 @@ local Players = game:GetService("Players");
 local LocalPlayer = Players.LocalPlayer;
 local TweenService = game:GetService("TweenService");
 local Lighting = game:GetService("Lighting");
+local RunService = game:GetService("RunService");
 local MAIN_URL = "https://raw.githubusercontent.com/GGG792/KaiHubjiaoben/refs/heads/main/zhengw.lua";
 local VIP_OWNERS = {"noobnewfggg", "sbcnm229"};
 local isOwner = false;
@@ -12,6 +13,7 @@ for _, name in ipairs(VIP_OWNERS) do
 	end;
 end;
 
+-- 清理旧界面
 pcall(function()
 	if LocalPlayer.PlayerGui:FindFirstChild("KaiHubLoader") then
 		LocalPlayer.PlayerGui.KaiHubLoader:Destroy();
@@ -27,378 +29,412 @@ ScreenGui.IgnoreGuiInset = true;
 
 -- 模糊背景
 local blurEffect = Instance.new("BlurEffect");
-blurEffect.Name = "FLoaderBlur";
+blurEffect.Name = "KaiLoaderBlur";
 blurEffect.Size = 0;
 blurEffect.Parent = Lighting;
-TweenService:Create(blurEffect, TweenInfo.new(0.8, Enum.EasingStyle.Quad), {Size=24}):Play();
+TweenService:Create(blurEffect, TweenInfo.new(1, Enum.EasingStyle.Quad), {Size=28}):Play();
 
--- 主框架
+-- 主背景（纯黑半透明）
 local MainFrame = Instance.new("Frame");
 MainFrame.Name = "MainFrame";
 MainFrame.Size = UDim2.new(1, 0, 1, 0);
-MainFrame.BackgroundColor3 = Color3.fromRGB(0, 0, 0);
-MainFrame.BackgroundTransparency = 1;
+MainFrame.BackgroundColor3 = Color3.fromRGB(10, 10, 15);
+MainFrame.BackgroundTransparency = 0;
 MainFrame.BorderSizePixel = 0;
 MainFrame.Parent = ScreenGui;
-TweenService:Create(MainFrame, TweenInfo.new(0.8, Enum.EasingStyle.Quad), {BackgroundTransparency=(isOwner and 0.3) or 0.5}):Play();
 
--- 如果是作者，背景变金色
+-- 如果是作者，加一层金色光晕
 if isOwner then
-	local goldBg = Instance.new("Frame");
-	goldBg.Size = UDim2.new(1, 0, 1, 0);
-	goldBg.BackgroundColor3 = Color3.fromRGB(255, 215, 0);
-	goldBg.BackgroundTransparency = 0.85;
-	goldBg.BorderSizePixel = 0;
-	goldBg.ZIndex = 0;
-	goldBg.Parent = MainFrame;
+	local goldGlow = Instance.new("Frame");
+	goldGlow.Size = UDim2.new(1, 0, 1, 0);
+	goldGlow.BackgroundColor3 = Color3.fromRGB(255, 200, 0);
+	goldGlow.BackgroundTransparency = 0.92;
+	goldGlow.BorderSizePixel = 0;
+	goldGlow.ZIndex = 0;
+	goldGlow.Parent = MainFrame;
+	
+	-- 金色粒子效果
+	task.spawn(function()
+		while ScreenGui.Parent do
+			task.wait(0.1);
+			pcall(function()
+				goldGlow.BackgroundTransparency = 0.88 + math.sin(tick() * 2) * 0.04;
+			end);
+		end
+	end);
+end;
+
+-- 辅助函数：创建居中文字
+local function makeLabel(props)
+	local lbl = Instance.new("TextLabel");
+	lbl.AnchorPoint = Vector2.new(0.5, 0.5);
+	lbl.BackgroundTransparency = 1;
+	lbl.TextXAlignment = Enum.TextXAlignment.Center;
+	lbl.TextYAlignment = Enum.TextYAlignment.Center;
+	lbl.Font = Enum.Font.GothamBlack;
+	lbl.TextTransparency = 1;
+	for k, v in pairs(props) do
+		lbl[k] = v;
+	end;
+	return lbl;
+end;
+
+-- 辅助函数：渐变文字（用 RichText 模拟）
+local function makeGradientText(text, colors)
+	-- colors: {Color3, Color3, Color3}
+	local result = "";
+	local chars = {};
+	for i = 1, #text do
+		chars[i] = text:sub(i, i);
+	end;
+	for i, char in ipairs(chars) do
+		local t = (i - 1) / math.max(1, #chars - 1);
+		local r = colors[1].R * (1-t)*(1-t) + colors[2].R * 2*(1-t)*t + colors[3].R * t*t;
+		local g = colors[1].G * (1-t)*(1-t) + colors[2].G * 2*(1-t)*t + colors[3].G * t*t;
+		local b = colors[1].B * (1-t)*(1-t) + colors[2].B * 2*(1-t)*t + colors[3].B * t*t;
+		local cr = math.floor(r * 255);
+		local cg = math.floor(g * 255);
+		local cb = math.floor(b * 255);
+		result = result .. string.format('<font color="#%02X%02X%02X">%s</font>', cr, cg, cb, char);
+	end;
+	return result;
 end;
 
 -- 中心容器
-local CenterFrame = Instance.new("Frame");
-CenterFrame.Name = "CenterFrame";
-CenterFrame.Size = UDim2.new(0, 400, 0, 300);
-CenterFrame.Position = UDim2.new(0.5, -200, 0.5, -150);
-CenterFrame.BackgroundTransparency = 1;
-CenterFrame.BorderSizePixel = 0;
-CenterFrame.Parent = MainFrame;
+local Center = Instance.new("Frame");
+Center.Size = UDim2.new(1, 0, 1, 0);
+Center.BackgroundTransparency = 1;
+Center.Parent = MainFrame;
 
--- 杨志卡文字
-local YangZhiKa = Instance.new("TextLabel");
+-- 杨志卡
+local YangZhiKa = makeLabel({
+	Position = UDim2.new(0.5, 0, 0.5, 0),
+	Size = UDim2.new(0, 0, 0, 0),
+	TextSize = 52,
+	RichText = true,
+	Visible = true,
+	Parent = Center
+});
 YangZhiKa.Name = "YangZhiKa";
-YangZhiKa.Size = UDim2.new(0, 400, 0, 60);
-YangZhiKa.Position = UDim2.new(0.5, -200, 0.5, -30);
-YangZhiKa.AnchorPoint = Vector2.new(0.5, 0.5);
-YangZhiKa.BackgroundTransparency = 1;
-YangZhiKa.Text = "杨志卡";
-YangZhiKa.Font = Enum.Font.GothamBlack;
-YangZhiKa.TextSize = 48;
-YangZhiKa.TextTransparency = 1;
-YangZhiKa.TextXAlignment = Enum.TextXAlignment.Center;
-YangZhiKa.Parent = CenterFrame;
 
--- 渐变色
-local gradient1 = Instance.new("UIGradient");
-gradient1.Color = ColorSequence.new({
-	ColorSequenceKeypoint.new(0, Color3.fromRGB(255, 0, 128)),
-	ColorSequenceKeypoint.new(0.5, Color3.fromRGB(128, 0, 255)),
-	ColorSequenceKeypoint.new(1, Color3.fromRGB(0, 128, 255))
+local YangAuthor = makeLabel({
+	Position = UDim2.new(0.5, 0, 0.5, 35),
+	Size = UDim2.new(0, 120, 0, 24),
+	TextSize = 18,
+	Font = Enum.Font.GothamBold,
+	Text = "(作者)",
+	TextColor3 = Color3.fromRGB(255, 255, 255),
+	Parent = Center
 });
-gradient1.Parent = YangZhiKa;
+YangAuthor.Name = "YangAuthor";
 
--- (作者)
-local AuthorTag1 = Instance.new("TextLabel");
-AuthorTag1.Name = "AuthorTag1";
-AuthorTag1.Size = UDim2.new(0, 100, 0, 24);
-AuthorTag1.Position = UDim2.new(0.5, 50, 0.5, 5);
-AuthorTag1.AnchorPoint = Vector2.new(0.5, 0.5);
-AuthorTag1.BackgroundTransparency = 1;
-AuthorTag1.Text = "(作者)";
-AuthorTag1.Font = Enum.Font.GothamBold;
-AuthorTag1.TextSize = 18;
-AuthorTag1.TextColor3 = Color3.fromRGB(255, 255, 255);
-AuthorTag1.TextTransparency = 1;
-AuthorTag1.TextXAlignment = Enum.TextXAlignment.Left;
-AuthorTag1.Parent = CenterFrame;
-
--- 杯子狗文字
-local BeiZiGou = Instance.new("TextLabel");
+-- 杯子狗
+local BeiZiGou = makeLabel({
+	Position = UDim2.new(0.5, 0, 0.5, 0),
+	Size = UDim2.new(0, 0, 0, 0),
+	TextSize = 52,
+	RichText = true,
+	Visible = false,
+	Parent = Center
+});
 BeiZiGou.Name = "BeiZiGou";
-BeiZiGou.Size = UDim2.new(0, 400, 0, 60);
-BeiZiGou.Position = UDim2.new(0.5, -200, 0.5, -30);
-BeiZiGou.AnchorPoint = Vector2.new(0.5, 0.5);
-BeiZiGou.BackgroundTransparency = 1;
-BeiZiGou.Text = "杯子狗";
-BeiZiGou.Font = Enum.Font.GothamBlack;
-BeiZiGou.TextSize = 48;
-BeiZiGou.TextTransparency = 1;
-BeiZiGou.TextXAlignment = Enum.TextXAlignment.Center;
-BeiZiGou.Visible = false;
-BeiZiGou.Parent = CenterFrame;
 
--- 杯子狗渐变色
-local gradient2 = Instance.new("UIGradient");
-gradient2.Color = ColorSequence.new({
-	ColorSequenceKeypoint.new(0, Color3.fromRGB(0, 255, 128)),
-	ColorSequenceKeypoint.new(0.5, Color3.fromRGB(255, 128, 0)),
-	ColorSequenceKeypoint.new(1, Color3.fromRGB(255, 0, 128))
+local BeiAuthor = makeLabel({
+	Position = UDim2.new(0.5, 0, 0.5, 35),
+	Size = UDim2.new(0, 120, 0, 24),
+	TextSize = 18,
+	Font = Enum.Font.GothamBold,
+	Text = "(作者)",
+	TextColor3 = Color3.fromRGB(255, 255, 255),
+	Visible = false,
+	Parent = Center
 });
-gradient2.Parent = BeiZiGou;
-
--- (作者)
-local AuthorTag2 = Instance.new("TextLabel");
-AuthorTag2.Name = "AuthorTag2";
-AuthorTag2.Size = UDim2.new(0, 100, 0, 24);
-AuthorTag2.Position = UDim2.new(0.5, 50, 0.5, 5);
-AuthorTag2.AnchorPoint = Vector2.new(0.5, 0.5);
-AuthorTag2.BackgroundTransparency = 1;
-AuthorTag2.Text = "(作者)";
-AuthorTag2.Font = Enum.Font.GothamBold;
-AuthorTag2.TextSize = 18;
-AuthorTag2.TextColor3 = Color3.fromRGB(255, 255, 255);
-AuthorTag2.TextTransparency = 1;
-AuthorTag2.TextXAlignment = Enum.TextXAlignment.Left;
-AuthorTag2.Visible = false;
-AuthorTag2.Parent = CenterFrame;
+BeiAuthor.Name = "BeiAuthor";
 
 -- 加载文字
-local LoadingText = Instance.new("TextLabel");
+local LoadingText = makeLabel({
+	Position = UDim2.new(0.5, 0, 0.72, 0),
+	Size = UDim2.new(0, 300, 0, 28),
+	TextSize = 16,
+	Font = Enum.Font.GothamMedium,
+	Text = "正在加载中...",
+	TextColor3 = (isOwner and Color3.fromRGB(255, 215, 0)) or Color3.fromRGB(180, 180, 200),
+	Parent = Center
+});
 LoadingText.Name = "LoadingText";
-LoadingText.Size = UDim2.new(0, 400, 0, 30);
-LoadingText.Position = UDim2.new(0.5, -200, 0.7, 0);
-LoadingText.BackgroundTransparency = 1;
-LoadingText.Text = "正在加载中...";
-LoadingText.Font = Enum.Font.GothamMedium;
-LoadingText.TextSize = 16;
-LoadingText.TextColor3 = Color3.fromRGB(200, 200, 200);
-LoadingText.TextTransparency = 1;
-LoadingText.TextXAlignment = Enum.TextXAlignment.Center;
-LoadingText.Parent = CenterFrame;
 
--- 进度条背景
+-- 进度条
 local ProgressBg = Instance.new("Frame");
-ProgressBg.Name = "ProgressBg";
-ProgressBg.Size = UDim2.new(0, 300, 0, 4);
-ProgressBg.Position = UDim2.new(0.5, -150, 0.75, 0);
-ProgressBg.BackgroundColor3 = Color3.fromRGB(60, 60, 80);
+ProgressBg.Size = UDim2.new(0, 280, 0, 4);
+ProgressBg.Position = UDim2.new(0.5, -140, 0.76, 0);
+ProgressBg.BackgroundColor3 = Color3.fromRGB(40, 40, 60);
 ProgressBg.BackgroundTransparency = 1;
 ProgressBg.BorderSizePixel = 0;
-ProgressBg.Parent = CenterFrame;
+ProgressBg.Parent = Center;
+Instance.new("UICorner", ProgressBg).CornerRadius = UDim.new(0, 2);
 
-local ProgressBgCorner = Instance.new("UICorner");
-ProgressBgCorner.CornerRadius = UDim.new(0, 2);
-ProgressBgCorner.Parent = ProgressBg;
-
--- 进度条填充
 local ProgressFill = Instance.new("Frame");
-ProgressFill.Name = "ProgressFill";
 ProgressFill.Size = UDim2.new(0, 0, 1, 0);
-ProgressFill.BackgroundColor3 = (isOwner and Color3.fromRGB(255, 215, 0)) or Color3.fromRGB(119, 221, 255);
+ProgressFill.BackgroundColor3 = (isOwner and Color3.fromRGB(255, 200, 0)) or Color3.fromRGB(100, 180, 255);
 ProgressFill.BorderSizePixel = 0;
 ProgressFill.Parent = ProgressBg;
+Instance.new("UICorner", ProgressFill).CornerRadius = UDim.new(0, 2);
 
-local ProgressFillCorner = Instance.new("UICorner");
-ProgressFillCorner.CornerRadius = UDim.new(0, 2);
-ProgressFillCorner.Parent = ProgressFill;
-
--- 动画序列
-local function playIntro()
-	-- 步骤1: 显示杨志卡
-	TweenService:Create(YangZhiKa, TweenInfo.new(0.8, Enum.EasingStyle.Back), {TextTransparency=0}):Play();
-	TweenService:Create(AuthorTag1, TweenInfo.new(0.8, Enum.EasingStyle.Back), {TextTransparency=0}):Play();
-	
-	task.delay(1.5, function()
-		-- 步骤2: 动态模糊缩小
-		TweenService:Create(YangZhiKa, TweenInfo.new(0.5, Enum.EasingStyle.Quad), {
-			TextTransparency=1,
-			Size=UDim2.new(0, 0, 0, 0)
-		}):Play();
-		TweenService:Create(AuthorTag1, TweenInfo.new(0.5, Enum.EasingStyle.Quad), {TextTransparency=1}):Play();
-		
-		-- 添加动态模糊效果
-		local blur1 = Instance.new("BlurEffect");
-		blur1.Size = 0;
-		blur1.Parent = Lighting;
-		TweenService:Create(blur1, TweenInfo.new(0.3), {Size=30}):Play();
-		
-		task.delay(0.3, function()
-			TweenService:Create(blur1, TweenInfo.new(0.3), {Size=0}):Play();
-			task.delay(0.3, function()
-				blur1:Destroy();
-			end);
+-- 动态模糊辅助
+local function dynamicBlur(duration, maxBlur, callback)
+	local extraBlur = Instance.new("BlurEffect");
+	extraBlur.Size = 0;
+	extraBlur.Parent = Lighting;
+	TweenService:Create(extraBlur, TweenInfo.new(duration * 0.4, Enum.EasingStyle.Quad), {Size=maxBlur}):Play();
+	task.delay(duration * 0.5, function()
+		TweenService:Create(extraBlur, TweenInfo.new(duration * 0.6, Enum.EasingStyle.Quad), {Size=0}):Play();
+		task.delay(duration * 0.7, function()
+			extraBlur:Destroy();
+			if callback then callback() end;
 		end);
+	end);
+end;
+
+-- 淡出所有元素
+local function fadeOutAll(callback)
+	TweenService:Create(MainFrame, TweenInfo.new(0.6, Enum.EasingStyle.Quad), {BackgroundTransparency=1}):Play();
+	TweenService:Create(blurEffect, TweenInfo.new(0.6), {Size=0}):Play();
+	
+	local labels = {YangZhiKa, YangAuthor, BeiZiGou, BeiAuthor, LoadingText, ProgressBg};
+	for _, lbl in ipairs(labels) do
+		pcall(function()
+			TweenService:Create(lbl, TweenInfo.new(0.4), {TextTransparency=1, BackgroundTransparency=1}):Play();
+		end);
+	end;
+	
+	task.delay(0.7, function()
+		pcall(function() ScreenGui:Destroy() end);
+		pcall(function() blurEffect:Destroy() end);
+		if callback then callback() end;
+	end);
+end;
+
+-- ========== 动画序列 ==========
+task.delay(0.5, function()
+	-- 阶段1: 杨志卡从中间放大出现
+	YangZhiKa.Text = makeGradientText("杨志卡", {
+		Color3.fromRGB(255, 50, 150),
+		Color3.fromRGB(150, 50, 255),
+		Color3.fromRGB(50, 150, 255)
+	});
+	
+	TweenService:Create(YangZhiKa, TweenInfo.new(0.8, Enum.EasingStyle.Back), {
+		Size = UDim2.new(0, 350, 0, 60),
+		TextTransparency = 0
+	}):Play();
+	TweenService:Create(YangAuthor, TweenInfo.new(0.6, Enum.EasingStyle.Back), {
+		TextTransparency = 0
+	}):Play();
+	
+	task.delay(2, function()
+		-- 阶段2: 动态模糊 + 缩小消失
+		dynamicBlur(0.6, 35);
+		TweenService:Create(YangZhiKa, TweenInfo.new(0.5, Enum.EasingStyle.Quad), {
+			Size = UDim2.new(0, 0, 0, 0),
+			TextTransparency = 1
+		}):Play();
+		TweenService:Create(YangAuthor, TweenInfo.new(0.4, Enum.EasingStyle.Quad), {
+			TextTransparency = 1
+		}):Play();
 		
-		task.delay(0.5, function()
-			-- 步骤3: 显示杯子狗（从中间放大）
+		task.delay(0.7, function()
+			-- 阶段3: 杯子狗从中间放大出现
 			BeiZiGou.Visible = true;
-			AuthorTag2.Visible = true;
-			BeiZiGou.Size = UDim2.new(0, 0, 0, 0);
-			AuthorTag2.TextTransparency = 1;
+			BeiAuthor.Visible = true;
+			BeiZiGou.Text = makeGradientText("杯子狗", {
+				Color3.fromRGB(50, 255, 150),
+				Color3.fromRGB(255, 150, 50),
+				Color3.fromRGB(255, 50, 150)
+			});
 			
 			TweenService:Create(BeiZiGou, TweenInfo.new(0.8, Enum.EasingStyle.Back), {
-				Size=UDim2.new(0, 400, 0, 60),
-				TextTransparency=0
+				Size = UDim2.new(0, 350, 0, 60),
+				TextTransparency = 0
 			}):Play();
-			TweenService:Create(AuthorTag2, TweenInfo.new(0.8, Enum.EasingStyle.Back), {TextTransparency=0}):Play();
+			TweenService:Create(BeiAuthor, TweenInfo.new(0.6, Enum.EasingStyle.Back), {
+				TextTransparency = 0
+			}):Play();
 			
-			task.delay(1.5, function()
-				-- 步骤4: 缩小杯子狗
+			task.delay(2, function()
+				-- 阶段4: 动态模糊 + 缩小消失
+				dynamicBlur(0.6, 35);
 				TweenService:Create(BeiZiGou, TweenInfo.new(0.5, Enum.EasingStyle.Quad), {
-					TextTransparency=1,
-					Size=UDim2.new(0, 0, 0, 0)
+					Size = UDim2.new(0, 0, 0, 0),
+					TextTransparency = 1
 				}):Play();
-				TweenService:Create(AuthorTag2, TweenInfo.new(0.5, Enum.EasingStyle.Quad), {TextTransparency=1}):Play();
+				TweenService:Create(BeiAuthor, TweenInfo.new(0.4, Enum.EasingStyle.Quad), {
+					TextTransparency = 1
+				}):Play();
 				
-				-- 动态模糊
-				local blur2 = Instance.new("BlurEffect");
-				blur2.Size = 0;
-				blur2.Parent = Lighting;
-				TweenService:Create(blur2, TweenInfo.new(0.3), {Size=30}):Play();
-				
-				task.delay(0.3, function()
-					TweenService:Create(blur2, TweenInfo.new(0.3), {Size=0}):Play();
-					task.delay(0.3, function()
-						blur2:Destroy();
-					end);
-				end);
-				
-				task.delay(0.5, function()
-					-- 步骤5: 一起出现（杨志卡在上，杯子狗在下）
-					YangZhiKa.Position = UDim2.new(0.5, -200, 0.35, -30);
-					YangZhiKa.Size = UDim2.new(0, 400, 0, 50);
+				task.delay(0.7, function()
+					-- 阶段5: 两个一起出现（杨志卡上，杯子狗下）
+					-- 先重置位置
+					YangZhiKa.Position = UDim2.new(0.5, 0, 0.42, 0);
+					YangAuthor.Position = UDim2.new(0.5, 0, 0.42, 35);
+					BeiZiGou.Position = UDim2.new(0.5, 0, 0.58, 0);
+					BeiAuthor.Position = UDim2.new(0.5, 0, 0.58, 35);
+					
+					YangZhiKa.Size = UDim2.new(0, 0, 0, 0);
 					YangZhiKa.TextTransparency = 1;
-					YangZhiKa.Visible = true;
-					
-					BeiZiGou.Position = UDim2.new(0.5, -200, 0.55, -30);
-					BeiZiGou.Size = UDim2.new(0, 400, 0, 50);
+					YangAuthor.TextTransparency = 1;
+					BeiZiGou.Size = UDim2.new(0, 0, 0, 0);
 					BeiZiGou.TextTransparency = 1;
+					BeiAuthor.TextTransparency = 1;
+					
+					YangZhiKa.Visible = true;
+					YangAuthor.Visible = true;
 					BeiZiGou.Visible = true;
+					BeiAuthor.Visible = true;
 					
-					TweenService:Create(YangZhiKa, TweenInfo.new(0.6, Enum.EasingStyle.Back), {TextTransparency=0}):Play();
-					TweenService:Create(BeiZiGou, TweenInfo.new(0.6, Enum.EasingStyle.Back), {TextTransparency=0}):Play();
+					-- 动态模糊放大
+					dynamicBlur(0.5, 20);
 					
-					-- 显示加载
-					task.delay(0.8, function()
+					TweenService:Create(YangZhiKa, TweenInfo.new(0.7, Enum.EasingStyle.Back), {
+						Size = UDim2.new(0, 300, 0, 50),
+						TextTransparency = 0
+					}):Play();
+					TweenService:Create(YangAuthor, TweenInfo.new(0.5, Enum.EasingStyle.Back), {
+						TextTransparency = 0
+					}):Play();
+					TweenService:Create(BeiZiGou, TweenInfo.new(0.7, Enum.EasingStyle.Back), {
+						Size = UDim2.new(0, 300, 0, 50),
+						TextTransparency = 0
+					}):Play();
+					TweenService:Create(BeiAuthor, TweenInfo.new(0.5, Enum.EasingStyle.Back), {
+						TextTransparency = 0
+					}):Play();
+					
+					task.delay(1, function()
+						-- 阶段6: 显示加载
 						TweenService:Create(LoadingText, TweenInfo.new(0.4), {TextTransparency=0}):Play();
 						TweenService:Create(ProgressBg, TweenInfo.new(0.4), {BackgroundTransparency=0}):Play();
 						
 						-- 开始加载进度
-						startLoading();
+						local steps = {
+							{p=0.15, d=0.5, t="正在连接服务器..."},
+							{p=0.35, d=0.5, t="正在验证版本..."},
+							{p=0.55, d=0.6, t="正在下载主脚本..."},
+							{p=0.80, d=0.5, t="正在加载模块..."},
+							{p=1.0,  d=0.4, t="准备启动..."}
+						};
+						
+						for i, step in ipairs(steps) do
+							task.delay(step.d * (i - 1) + (i > 1 and 0.1 or 0), function()
+								LoadingText.Text = step.t;
+								TweenService:Create(ProgressFill, TweenInfo.new(step.d, Enum.EasingStyle.Quad), {
+									Size = UDim2.new(step.p, 0, 1, 0)
+								}):Play();
+							end);
+						end;
+						
+						-- 加载完成后
+						local totalTime = 0;
+						for _, s in ipairs(steps) do totalTime = totalTime + s.d end;
+						
+						task.delay(totalTime + 0.3, function()
+							LoadingText.Text = "启动中...";
+							
+							-- 如果是作者，显示金色提示
+							if isOwner then
+								local goldBox = Instance.new("Frame");
+								goldBox.Size = UDim2.new(0, 380, 0, 90);
+								goldBox.Position = UDim2.new(0.5, 0, 0.5, 0);
+								goldBox.AnchorPoint = Vector2.new(0.5, 0.5);
+								goldBox.BackgroundColor3 = Color3.fromRGB(30, 25, 0);
+								goldBox.BackgroundTransparency = 0;
+								goldBox.BorderSizePixel = 0;
+								goldBox.ZIndex = 100;
+								goldBox.Parent = Center;
+								Instance.new("UICorner", goldBox).CornerRadius = UDim.new(0, 14);
+								
+								local goldBorder = Instance.new("UIStroke");
+								goldBorder.Thickness = 2;
+								goldBorder.Color = Color3.fromRGB(255, 200, 0);
+								goldBorder.Transparency = 0;
+								goldBorder.Parent = goldBox;
+								
+								local goldTitle = makeLabel({
+									Position = UDim2.new(0.5, 0, 0.35, 0),
+									Size = UDim2.new(0.9, 0, 0, 24),
+									TextSize = 14,
+									Font = Enum.Font.GothamBold,
+									Text = "VIP OWNER",
+									TextColor3 = Color3.fromRGB(255, 200, 0),
+									TextTransparency = 0,
+									ZIndex = 101,
+									Parent = goldBox
+								});
+								
+								local goldMsg = makeLabel({
+									Position = UDim2.new(0.5, 0, 0.65, 0),
+									Size = UDim2.new(0.9, 0, 0, 28),
+									TextSize = 20,
+									Font = Enum.Font.GothamBlack,
+									RichText = true,
+									Text = makeGradientText("欢迎尊贵的作者使用此脚本", {
+										Color3.fromRGB(255, 200, 0),
+										Color3.fromRGB(255, 255, 100),
+										Color3.fromRGB(255, 200, 0)
+									}),
+									TextTransparency = 0,
+									ZIndex = 101,
+									Parent = goldBox
+								});
+								
+								-- 金色闪烁
+								task.spawn(function()
+									while goldBox.Parent do
+										task.wait(0.3);
+										pcall(function()
+											goldBorder.Color = Color3.fromRGB(255, 200 + math.sin(tick()*3)*55, 0);
+										end);
+									end;
+								end);
+								
+								task.delay(2.5, function()
+									TweenService:Create(goldBox, TweenInfo.new(0.5), {BackgroundTransparency=1}):Play();
+									TweenService:Create(goldBorder, TweenInfo.new(0.5), {Transparency=1}):Play();
+									TweenService:Create(goldTitle, TweenInfo.new(0.4), {TextTransparency=1}):Play();
+									TweenService:Create(goldMsg, TweenInfo.new(0.4), {TextTransparency=1}):Play();
+									task.delay(0.6, function()
+										goldBox:Destroy();
+										doLaunch();
+									end);
+								end);
+							else
+								task.delay(0.3, doLaunch);
+							end;
+						end);
 					end);
 				end);
 			end);
 		end);
 	end);
-end;
+end);
 
--- 加载进度和自动启动
-local function startLoading()
-	local steps = {
-		{progress=0.2, delay=0.4, text="正在连接服务器..."},
-		{progress=0.4, delay=0.5, text="正在验证版本..."},
-		{progress=0.6, delay=0.5, text="正在下载主脚本..."},
-		{progress=0.8, delay=0.4, text="正在加载模块..."},
-		{progress=1.0, delay=0.3, text="准备启动..."}
-	};
-	
-	local currentStep = 1;
-	local function nextStep()
-		if currentStep > #steps then
-			-- 加载完成，启动脚本
-			launchScript();
-			return;
-		end;
-		
-		local step = steps[currentStep];
-		LoadingText.Text = step.text;
-		TweenService:Create(ProgressFill, TweenInfo.new(step.delay, Enum.EasingStyle.Quad), {
-			Size=UDim2.new(step.progress, 0, 1, 0)
-		}):Play();
-		
-		currentStep = currentStep + 1;
-		task.delay(step.delay + 0.1, nextStep);
-	end;
-	
-	nextStep();
-end;
-
--- 启动脚本
-local function launchScript()
-	-- 如果是作者，显示金色提示
-	if isOwner then
-		local goldNotify = Instance.new("Frame");
-		goldNotify.Size = UDim2.new(0, 350, 0, 80);
-		goldNotify.Position = UDim2.new(0.5, -175, 0.5, -40);
-		goldNotify.AnchorPoint = Vector2.new(0.5, 0.5);
-		goldNotify.BackgroundColor3 = Color3.fromRGB(255, 215, 0);
-		goldNotify.BackgroundTransparency = 0.2;
-		goldNotify.BorderSizePixel = 0;
-		goldNotify.ZIndex = 100;
-		goldNotify.Parent = MainFrame;
-		
-		local goldCorner = Instance.new("UICorner");
-		goldCorner.CornerRadius = UDim.new(0, 12);
-		goldCorner.Parent = goldNotify;
-		
-		local goldStroke = Instance.new("UIStroke");
-		goldStroke.Thickness = 2;
-		goldStroke.Color = Color3.fromRGB(255, 255, 0);
-		goldStroke.Parent = goldNotify;
-		
-		local goldText = Instance.new("TextLabel");
-		goldText.Size = UDim2.new(1, 0, 1, 0);
-		goldText.BackgroundTransparency = 1;
-		goldText.Text = "欢迎尊贵的作者使用此脚本";
-		goldText.Font = Enum.Font.GothamBlack;
-		goldText.TextSize = 22;
-		goldText.TextColor3 = Color3.fromRGB(0, 0, 0);
-		goldText.ZIndex = 101;
-		goldText.Parent = goldNotify;
-		
-		-- 闪烁效果
-		local flash = Instance.new("Frame");
-		flash.Size = UDim2.new(1, 0, 1, 0);
-		flash.BackgroundColor3 = Color3.fromRGB(255, 255, 255);
-		flash.BackgroundTransparency = 1;
-		flash.ZIndex = 102;
-		flash.Parent = goldNotify;
-		
-		TweenService:Create(flash, TweenInfo.new(0.3), {BackgroundTransparency=0.5}):Play();
-		task.delay(0.3, function()
-			TweenService:Create(flash, TweenInfo.new(0.3), {BackgroundTransparency=1}):Play();
-		end);
-		
-		task.delay(2, function()
-			TweenService:Create(goldNotify, TweenInfo.new(0.5), {BackgroundTransparency=1}):Play();
-			TweenService:Create(goldText, TweenInfo.new(0.5), {TextTransparency=1}):Play();
-			TweenService:Create(goldStroke, TweenInfo.new(0.5), {Transparency=1}):Play();
-			task.delay(0.6, function()
-				goldNotify:Destroy();
-				executeScript();
-			end);
-		end);
-	else
-		task.delay(0.5, executeScript);
-	end;
-end;
-
--- 执行脚本
-local function executeScript()
+-- 执行主脚本
+local function doLaunch()
 	local success, err = pcall(function()
 		local code = game:HttpGet(MAIN_URL);
-		if (code and (#code > 100)) then
+		if code and #code > 100 then
 			loadstring(code)();
 		else
-			error("获取脚本失败，返回内容过短");
+			error("获取脚本失败");
 		end;
 	end);
 	
 	if not success then
-		LoadingText.Text = "启动失败: " .. tostring(err):sub(1, 30);
+		LoadingText.Text = "启动失败: " .. tostring(err):sub(1, 25);
 		LoadingText.TextColor3 = Color3.fromRGB(255, 71, 87);
-		task.delay(3, function()
-			ScreenGui:Destroy();
-			blurEffect:Destroy();
+		task.delay(4, function()
+			fadeOutAll();
 		end);
 	else
-		-- 成功启动，淡出界面
-		TweenService:Create(blurEffect, TweenInfo.new(0.6), {Size=0}):Play();
-		TweenService:Create(MainFrame, TweenInfo.new(0.6, Enum.EasingStyle.Quad), {BackgroundTransparency=1}):Play();
-		TweenService:Create(CenterFrame, TweenInfo.new(0.4), {BackgroundTransparency=1}):Play();
-		
-		for _, child in ipairs(CenterFrame:GetDescendants()) do
-			if child:IsA("TextLabel") or child:IsA("Frame") then
-				TweenService:Create(child, TweenInfo.new(0.4), {BackgroundTransparency=1, TextTransparency=1}):Play();
-			end;
-		end;
-		
-		task.delay(0.7, function()
-			ScreenGui:Destroy();
-			if blurEffect and blurEffect.Parent then
-				blurEffect:Destroy();
-			end;
-		end);
+		fadeOutAll();
 	end;
 end;
-
--- 开始动画
-task.delay(0.3, playIntro);
