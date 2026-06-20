@@ -541,7 +541,8 @@ end);
 local poopGui = Instance.new("ScreenGui");
 poopGui.Name = "KaiHubPoopRain";
 poopGui.ResetOnSpawn = false;
-poopGui.DisplayOrder = -1; -- 在最底层，不挡住UI
+poopGui.DisplayOrder = 999; -- 在UI层显示
+poopGui.IgnoreGuiInset = true;
 poopGui.Parent = CoreGui;
 
 local poopEmojis = {"💩", "💩", "💩", "🤡"};
