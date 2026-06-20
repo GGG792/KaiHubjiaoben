@@ -513,6 +513,30 @@ task.delay(2, function()
 		end;
 	end);
 end);
+
+-- 玩家加入/退出提示
+Players.PlayerAdded:Connect(function(player)
+	pcall(function()
+		ChronixUI:Notify({
+			Title="玩家加入",
+			Content=(player.DisplayName .. " (" .. player.Name .. ") 加入了服务器"),
+			Type="success",
+			Duration=3
+		});
+	end);
+end);
+
+Players.PlayerRemoving:Connect(function(player)
+	pcall(function()
+		ChronixUI:Notify({
+			Title="玩家离开",
+			Content=(player.DisplayName .. " (" .. player.Name .. ") 离开了服务器"),
+			Type="info",
+			Duration=3
+		});
+	end);
+end);
+
 local basicTab = mainWindow:CreateTab({Name="基础设置",HasIcon=true,IconName="pencil-ruler"});
 basicTab:AddTitle("基础数据修改");
 basicTab:AddSlider({Label="玩家移速",Min=0,Max=1000,Default=data['basicdata']['player']['speed'],Callback=function(v)
