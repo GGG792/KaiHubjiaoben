@@ -403,48 +403,73 @@ combatSection:Toggle({Title="自动打人",Value=false,Callback=function(Value)
 		autoFarmThread = nil;
 	end
 end});
--- 玩家选择列表
-local playerDropdown = nil;
-local function refreshPlayerDropdown()
-	local playerNames = {};
-	for _, p in ipairs(game:GetService("Players"):GetPlayers()) do
-		if p ~= game:GetService("Players").LocalPlayer then
-			table.insert(playerNames, p.Name);
-		end
-	end
-	if playerDropdown then
-		playerDropdown:SetOptions(playerNames);
-	end
+-- 玩家选择列表 (使用按钮方式，兼容所有UI库)
+local playerSelectButtons = {};
+local selectedPlayerLabel = nil;
+
+local function clearPlayerButtons()
+	for _, btn in ipairs(playerSelectButtons) do
+		if btn and btn.Destroy then
+			btn:Destroy();
+		end;
+	end;
+	playerSelectButtons = {};
 end;
 
-playerDropdown = combatSection:Dropdown({Title="选择目标玩家",Options={},Callback=function(Value)
-	for _, p in ipairs(game:GetService("Players"):GetPlayers()) do
-		if p.Name == Value then
-			specificPlayerTarget = p;
-			break;
-		end
+local function refreshPlayerList()
+	clearPlayerButtons();
+	
+	local players = game:GetService("Players"):GetPlayers();
+	local otherPlayers = {};
+	for _, p in ipairs(players) do
+		if p ~= game:GetService("Players").LocalPlayer then
+			table.insert(otherPlayers, p);
+		end;
 	end;
-end});
+	
+	if #otherPlayers == 0 then
+		local noPlayerBtn = combatSection:Button({Title="[暂无其他玩家]",Callback=function() end});
+		table.insert(playerSelectButtons, noPlayerBtn);
+		return;
+	end;
+	
+	for _, p in ipairs(otherPlayers) do
+		local btn = combatSection:Button({
+			Title="选择: " .. p.DisplayName .. " (" .. p.Name .. ")",
+			Callback=function()
+				specificPlayerTarget = p;
+				if selectedPlayerLabel then
+					selectedPlayerLabel:SetTitle("当前目标: " .. p.DisplayName .. " (" .. p.Name .. ")");
+				end;
+			end
+		});
+		table.insert(playerSelectButtons, btn);
+	end;
+end;
 
-refreshPlayerDropdown();
+-- 显示当前选择的目标
+selectedPlayerLabel = combatSection:Label({Title="当前目标: 无 (随机选择)"});
+
+-- 初始刷新
+refreshPlayerList();
 
 -- 玩家加入/离开时刷新列表
 game:GetService("Players").PlayerAdded:Connect(function()
 	task.wait(0.5);
-	refreshPlayerDropdown();
+	refreshPlayerList();
 end);
 game:GetService("Players").PlayerRemoving:Connect(function()
 	task.wait(0.5);
-	refreshPlayerDropdown();
+	refreshPlayerList();
 end);
 
 combatSection:Button({Title="刷新玩家列表",Callback=function()
-	refreshPlayerDropdown();
+	refreshPlayerList();
 end});
-combatSection:Button({Title="清除目标",Callback=function()
+combatSection:Button({Title="清除目标 (随机)",Callback=function()
 	specificPlayerTarget = nil;
-	if playerDropdown then
-		playerDropdown:SetValue("");
+	if selectedPlayerLabel then
+		selectedPlayerLabel:SetTitle("当前目标: 无 (随机选择)");
 	end;
 end});
 combatSection:Toggle({Title="自动格挡",Value=false,Callback=function(Value)
