@@ -403,12 +403,49 @@ combatSection:Toggle({Title="自动打人",Value=false,Callback=function(Value)
 		autoFarmThread = nil;
 	end
 end});
-combatSection:Input({Title="输入玩家用户名",Placeholder="输入玩家用户名",Callback=function(Value)
-	specificPlayerUsername = Value;
-	specificPlayerTarget = findClosestMatchingPlayer(specificPlayerUsername);
+-- 玩家选择列表
+local playerDropdown = nil;
+local function refreshPlayerDropdown()
+	local playerNames = {};
+	for _, p in ipairs(game:GetService("Players"):GetPlayers()) do
+		if p ~= game:GetService("Players").LocalPlayer then
+			table.insert(playerNames, p.Name);
+		end
+	end
+	if playerDropdown then
+		playerDropdown:SetOptions(playerNames);
+	end
+end;
+
+playerDropdown = combatSection:Dropdown({Title="选择目标玩家",Options={},Callback=function(Value)
+	for _, p in ipairs(game:GetService("Players"):GetPlayers()) do
+		if p.Name == Value then
+			specificPlayerTarget = p;
+			break;
+		end
+	end;
 end});
-combatSection:Button({Title="关闭自动打人",Callback=function()
+
+refreshPlayerDropdown();
+
+-- 玩家加入/离开时刷新列表
+game:GetService("Players").PlayerAdded:Connect(function()
+	task.wait(0.5);
+	refreshPlayerDropdown();
+end);
+game:GetService("Players").PlayerRemoving:Connect(function()
+	task.wait(0.5);
+	refreshPlayerDropdown();
+end);
+
+combatSection:Button({Title="刷新玩家列表",Callback=function()
+	refreshPlayerDropdown();
+end});
+combatSection:Button({Title="清除目标",Callback=function()
 	specificPlayerTarget = nil;
+	if playerDropdown then
+		playerDropdown:SetValue("");
+	end;
 end});
 combatSection:Toggle({Title="自动格挡",Value=false,Callback=function(Value)
 	autoBlockEnabled = Value;
