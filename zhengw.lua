@@ -537,6 +537,135 @@ Players.PlayerRemoving:Connect(function(player)
 	end);
 end);
 
+-- ========== 从天而降的粑粑表情包 ==========
+local poopGui = Instance.new("ScreenGui");
+poopGui.Name = "KaiHubPoopRain";
+poopGui.ResetOnSpawn = false;
+poopGui.DisplayOrder = -1; -- 在最底层，不挡住UI
+poopGui.Parent = CoreGui;
+
+local poopEmojis = {"💩", "💩", "💩", "🤡"};
+local maxPoops = 6; -- 数量不多不少
+local poopList = {};
+
+local function createPoop()
+	if #poopList >= maxPoops then return; end;
+
+	local poop = Instance.new("TextLabel");
+	poop.Name = "FallingPoop";
+	poop.Size = UDim2.new(0, math.random(30, 50), 0, math.random(30, 50));
+	poop.Position = UDim2.new(math.random() * 0.9, 0, -0.1, 0);
+	poop.BackgroundTransparency = 1;
+	poop.Text = poopEmojis[math.random(1, #poopEmojis)];
+	poop.TextSize = math.random(24, 40);
+	poop.Font = Enum.Font.GothamBold;
+	poop.TextTransparency = 0.3; -- 半透明，不完全挡住背景
+	poop.Parent = poopGui;
+	table.insert(poopList, poop);
+
+	-- 随机下落速度和左右摆动
+	local fallSpeed = math.random(80, 150);
+	local swayAmount = math.random(20, 60);
+	local swaySpeed = math.random(1, 3);
+	local startPosX = math.random() * 0.9;
+	local startTime = tick();
+
+	task.spawn(function()
+		while poop and poop.Parent do
+			local elapsed = tick() - startTime;
+			local yProgress = elapsed * fallSpeed;
+			local sway = math.sin(elapsed * swaySpeed) * (swayAmount / 1000);
+
+			poop.Position = UDim2.new(
+				math.clamp(startPosX + sway, 0, 0.85), 0,
+				-0.1 + (yProgress / 1000), 0
+			);
+
+			-- 落出屏幕后删除
+			if yProgress > 1200 then
+				poop:Destroy();
+				for i, p in ipairs(poopList) do
+					if p == poop then
+						table.remove(poopList, i);
+						break;
+					end;
+				end;
+				return;
+			end;
+
+			task.wait(0.03);
+		end;
+	end);
+end;
+
+-- 循环生成粑粑
+task.spawn(function()
+	while poopGui and poopGui.Parent do
+		createPoop();
+		task.wait(math.random(1.5, 3)); -- 每隔1.5-3秒生成一个
+	end;
+end);
+
+-- ========== UI可拖拽功能 ==========
+task.delay(3, function()
+	pcall(function()
+		-- 找到ChronixUI的主窗口Frame
+		local gui = LocalPlayer.PlayerGui:FindFirstChild("ChronixUI") or LocalPlayer.PlayerGui:FindFirstChildWhichIsA("ScreenGui");
+		if not gui then return; end;
+
+		local mainFrame = nil;
+		for _, child in ipairs(gui:GetDescendants()) do
+			if child:IsA("Frame") and child.Size.Y.Offset > 400 and child:FindFirstChildWhichIsA("UIListLayout") == nil then
+				mainFrame = child;
+				break;
+			end;
+		end;
+
+		if not mainFrame then return; end;
+
+		-- 找到标题栏作为拖拽区域
+		local titleBar = mainFrame:FindFirstChildWhichIsA("TextButton") or mainFrame:FindFirstChild("Title");
+		if not titleBar then
+			-- 尝试找第一个子Frame作为标题栏
+			for _, child in ipairs(mainFrame:GetChildren()) do
+				if child:IsA("Frame") and child.Size.Y.Offset < 50 and child.Size.Y.Offset > 15 then
+					titleBar = child;
+					break;
+				end;
+			end;
+		end;
+
+		if titleBar then
+			titleBar.Active = true;
+			titleBar.InputBegan:Connect(function(input)
+				if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
+					local dragStart = input.Position;
+					local startPos = mainFrame.Position;
+
+					local dragConn;
+					dragConn = UserInputService.InputChanged:Connect(function(input2)
+						if input2.UserInputType == Enum.UserInputType.MouseMovement or input2.UserInputType == Enum.UserInputType.Touch then
+							local delta = input2.Position - dragStart;
+							mainFrame.Position = UDim2.new(
+								startPos.X.Scale, startPos.X.Offset + delta.X,
+								startPos.Y.Scale, startPos.Y.Offset + delta.Y
+							);
+						end;
+					end);
+
+					local endConn;
+					endConn = UserInputService.InputEnded:Connect(function(input2)
+						if input2.UserInputType == Enum.UserInputType.MouseButton1 or input2.UserInputType == Enum.UserInputType.Touch then
+							if dragConn then dragConn:Disconnect(); end;
+							if endConn then endConn:Disconnect(); end;
+						end;
+					end);
+				end;
+			end);
+		end;
+	end);
+end);
+
 local basicTab = mainWindow:CreateTab({Name="基础设置",HasIcon=true,IconName="pencil-ruler"});
 basicTab:AddTitle("基础数据修改");
 basicTab:AddSlider({Label="玩家移速",Min=0,Max=1000,Default=data['basicdata']['player']['speed'],Callback=function(v)
