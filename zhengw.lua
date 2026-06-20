@@ -537,75 +537,87 @@ Players.PlayerRemoving:Connect(function(player)
 	end);
 end);
 
--- ========== 从天而降的粑粑表情包 ==========
-local poopGui = Instance.new("ScreenGui");
-poopGui.Name = "KaiHubPoopRain";
-poopGui.ResetOnSpawn = false;
-poopGui.DisplayOrder = 999; -- 在UI层显示
-poopGui.IgnoreGuiInset = true;
-poopGui.Parent = CoreGui;
+-- ========== 从天而降的粑粑表情包 (在UI窗口内部) ==========
+local poopContainer = Instance.new("Frame");
+poopContainer.Name = "PoopRainContainer";
+poopContainer.Size = UDim2.new(1, 0, 1, 0);
+poopContainer.BackgroundTransparency = 1;
+poopContainer.ClipsDescendants = true; -- 裁剪到UI窗口范围内
+poopContainer.ZIndex = 0; -- 在UI内容下面，不挡住按钮
 
 local poopEmojis = {"💩", "💩", "💩", "🤡"};
-local maxPoops = 6; -- 数量不多不少
+local maxPoops = 6;
 local poopList = {};
 
 local function createPoop()
-	if #poopList >= maxPoops then return; end;
+	if #poopList >= maxPoops then return; end
+	if not poopContainer or not poopContainer.Parent then return; end
 
 	local poop = Instance.new("TextLabel");
-	poop.Name = "FallingPoop";
-	poop.Size = UDim2.new(0, math.random(30, 50), 0, math.random(30, 50));
-	poop.Position = UDim2.new(math.random() * 0.9, 0, -0.1, 0);
-	poop.BackgroundTransparency = 1;
-	poop.Text = poopEmojis[math.random(1, #poopEmojis)];
-	poop.TextSize = math.random(24, 40);
-	poop.Font = Enum.Font.GothamBold;
-	poop.TextTransparency = 0.3; -- 半透明，不完全挡住背景
-	poop.Parent = poopGui;
-	table.insert(poopList, poop);
+	poop.Name = "FallingPoop"
+	poop.Size = UDim2.new(0, math.random(30, 50), 0, math.random(30, 50))
+	poop.Position = UDim2.new(math.random() * 0.85, 0, -0.08, 0)
+	poop.BackgroundTransparency = 1
+	poop.Text = poopEmojis[math.random(1, #poopEmojis)]
+	poop.TextSize = math.random(24, 40)
+	poop.Font = Enum.Font.GothamBold
+	poop.TextTransparency = 0.3
+	poop.ZIndex = 0
+	poop.Parent = poopContainer
+	table.insert(poopList, poop)
 
-	-- 随机下落速度和左右摆动
-	local fallSpeed = math.random(80, 150);
-	local swayAmount = math.random(20, 60);
-	local swaySpeed = math.random(1, 3);
-	local startPosX = math.random() * 0.9;
-	local startTime = tick();
+	local fallSpeed = math.random(60, 120)
+	local swayAmount = math.random(20, 60)
+	local swaySpeed = math.random(1, 3)
+	local startPosX = math.random() * 0.85
+	local startTime = tick()
+	local containerH = poopContainer.AbsoluteSize.Y
 
 	task.spawn(function()
-		while poop and poop.Parent do
-			local elapsed = tick() - startTime;
-			local yProgress = elapsed * fallSpeed;
-			local sway = math.sin(elapsed * swaySpeed) * (swayAmount / 1000);
+		while poop and poop.Parent and poopContainer and poopContainer.Parent do
+			local elapsed = tick() - startTime
+			local yProgress = elapsed * fallSpeed
+			local sway = math.sin(elapsed * swaySpeed) * (swayAmount / 1000)
 
 			poop.Position = UDim2.new(
 				math.clamp(startPosX + sway, 0, 0.85), 0,
-				-0.1 + (yProgress / 1000), 0
-			);
+				-0.08 + (yProgress / math.max(containerH, 100)), 0
+			)
 
-			-- 落出屏幕后删除
-			if yProgress > 1200 then
-				poop:Destroy();
+			if yProgress > containerH + 100 then
+				poop:Destroy()
 				for i, p in ipairs(poopList) do
 					if p == poop then
-						table.remove(poopList, i);
-						break;
-					end;
-				end;
-				return;
-			end;
+						table.remove(poopList, i)
+						break
+					end
+				end
+				return
+			end
 
-			task.wait(0.03);
-		end;
-	end);
-end;
+			task.wait(0.03)
+		end
+	end)
+end
 
--- 循环生成粑粑
-task.spawn(function()
-	while poopGui and poopGui.Parent do
-		createPoop();
-		task.wait(math.random(1.5, 3)); -- 每隔1.5-3秒生成一个
-	end;
-end);
+-- 延迟等待UI窗口创建完成后，把粑粑容器放进去
+task.delay(2, function()
+	pcall(function()
+		local gui = LocalPlayer.PlayerGui:FindFirstChild("ChronixUI") or LocalPlayer.PlayerGui:FindFirstChildWhichIsA("ScreenGui")
+		if not gui then return end
+		for _, child in ipairs(gui:GetDescendants()) do
+			if child:IsA("Frame") and child.Size.Y.Offset > 400 and child:FindFirstChildWhichIsA("UIListLayout") == nil then
+				poopContainer.Parent = child
+				break
+			end
+		end
+	end)
+	-- 开始循环生成
+	while poopContainer and poopContainer.Parent do
+		createPoop()
+		task.wait(math.random(1.5, 3))
+	end
+end)
 
 -- ========== UI可拖拽功能 ==========
 task.delay(3, function()
