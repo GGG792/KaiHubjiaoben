@@ -3,7 +3,7 @@ local cloneref = cloneref or clonereference or function(obj) return obj end
 ConfigModule.mainFolderName = nil
 ConfigModule.config = {}
 
--- 字符串分割辅助函数
+
 local function stringSplit(str, delimiter)
     local result = {}
     local from = 1
@@ -17,7 +17,7 @@ local function stringSplit(str, delimiter)
     return result
 end
 
--- 检查文件扩展名是否为音频文件
+
 local function isAudioFile(filename)
     local audioExtensions = {
         [".mp3"] = true,
@@ -38,12 +38,12 @@ local function isAudioFile(filename)
     return false
 end
 
--- 递归创建目录
+
 local function createDirectory(path)
     local parts = stringSplit(path, "/")
     local currentPath = ""
     for _, part in ipairs(parts) do
-        if part ~= "" then  -- 跳过空部分
+        if part ~= "" then  
             if currentPath == "" then
                 currentPath = part
             else
@@ -67,26 +67,26 @@ local function createDirectory(path)
 end
 
 local function isSupportedPath(str)
-    -- 检查是否包含非 ASCII 字符（中文、日文、特殊 Unicode 等）
+    
     for _, char in utf8.codes(str) do
         if char > 127 then
-            -- 非 ASCII 字符
+            
             return false
         end
     end
     
-    -- 可选：进一步检查是否包含某些特殊符号
-    -- Potassium 通常不支持这些字符
+    
+    
     local unsafeChars = {
-        ["\\"] = true,  -- 反斜杠
-        [":"] = true,   -- 冒号
-        ["*"] = true,   -- 星号
-        ["?"] = true,   -- 问号
-        ['"'] = true,   -- 双引号
-        ["<"] = true,   -- 小于号
-        [">"] = true,   -- 大于号
-        ["|"] = true,   -- 竖线
-        ["%%"] = true,  -- 百分号（在某些系统中有特殊含义）
+        ["\\"] = true,  
+        [":"] = true,   
+        ["*"] = true,   
+        ["?"] = true,   
+        ['"'] = true,   
+        ["<"] = true,   
+        [">"] = true,   
+        ["|"] = true,   
+        ["%%"] = true,  
     }
     
     for char in string.gmatch(str, ".") do
@@ -98,7 +98,7 @@ local function isSupportedPath(str)
     return true
 end
 
--- 设置主配置文件夹
+
 function ConfigModule.setmain(folderName)
     if not folderName or folderName == "" then
         error("必须提供有效的主配置文件夹名称")
@@ -108,7 +108,7 @@ function ConfigModule.setmain(folderName)
     createDirectory(folderName)
 end
 
--- 创建配置
+
 function ConfigModule.createconfig(path)
     if not ConfigModule.mainFolderName then
         error("请先使用 setmain() 设置主配置文件夹")
@@ -127,12 +127,12 @@ function ConfigModule.createconfig(path)
         fullPath = fullPath .. "/" .. part
     end
     
-    -- 创建目录结构
+    
     createDirectory(fullPath)
     
     local configFilePath = fullPath .. "/" .. fileName .. ".json"
     
-    -- 加载或创建配置
+    
     local configData = {}
     local success, content = pcall(function()
         return readfile(configFilePath)
@@ -149,7 +149,7 @@ function ConfigModule.createconfig(path)
     
     local configObject = {}
     
-    -- 使用闭包存储数据
+    
     local data = configData
     local filePath = configFilePath
     
@@ -170,7 +170,7 @@ function ConfigModule.createconfig(path)
     return configObject
 end
 
--- 创建音乐配置（扫描音乐文件夹并返回音乐表）
+
 function ConfigModule.createmusicconfig(path)
     if not ConfigModule.mainFolderName then
         error("请先使用 setmain() 设置主配置文件夹")
@@ -180,16 +180,16 @@ function ConfigModule.createmusicconfig(path)
         error("必须提供有效的音乐配置路径")
     end
     
-    -- 构建音乐文件夹路径
+    
     local musicFolderPath = ConfigModule.mainFolderName .. "/" .. path
     
-    -- 确保目录存在
+    
     if not isfolder(musicFolderPath) then
         makefolder(musicFolderPath)
         return { ["无"] = "" }
     end
     
-    -- 使用Potassium的listfiles API获取文件列表
+    
     local musicTable = {}
     local success, files = pcall(function()
         return listfiles(musicFolderPath)
@@ -197,18 +197,18 @@ function ConfigModule.createmusicconfig(path)
     
     if success and files then
         for _, filepath in ipairs(files) do
-            -- 提取文件名部分
+            
             local parts = stringSplit(filepath, "\\")
             local filename = parts[#parts]
 
             if not isSupportedPath(filename) then
                 warn("不支持的文件名: " .. filename)
-                -- 跳转到下一个文件
+                
             elseif isAudioFile(filename) then
-                -- 获取不带扩展名的文件名作为键
+                
                 local nameWithoutExt = string.gsub(filename, "%.[^.]*$", "")
                 
-                -- 获取资产ID
+                
                 local assetId = getcustomasset(filepath)
                 
                 if assetId and assetId ~= "" then

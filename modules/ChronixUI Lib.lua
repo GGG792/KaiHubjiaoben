@@ -1,4 +1,4 @@
--- ChronixUI v4.3 - 添加加载动画系统
+
 
 local ChronixUI = {}
 ChronixUI.Version = "4.3.0"
@@ -13,7 +13,7 @@ ChronixUI.Settings = {
     PrivacyMode = false,
 }
 
--- 服务引用
+
 local cloneref = cloneref or clonereference or function(obj) return obj end
 local Players = cloneref(game:GetService("Players"))
 local UserInputService = cloneref(game:GetService("UserInputService"))
@@ -28,14 +28,14 @@ local Mouse = LocalPlayer:GetMouse()
 
 local UIParticleSystem = loadstring(game:HttpGet("https://raw.atomgit.com/Furrycalin/ChronixHub/raw/main/modules/UIParticleSystem.lua"))()
 
--- ========== 加载动画模块 ==========
+
 local LoadingAnimation = {}
 
 function LoadingAnimation:Play(config)
     local windowName = config.Name or "ChronixUI"
     local showAnimation = config.ShowLoadingAnimation
     
-    -- 如果不需要显示动画，直接返回
+    
     if showAnimation == false then
         return {
             Finished = true,
@@ -43,28 +43,28 @@ function LoadingAnimation:Play(config)
         }
     end
 
-    -- ===== 设备类型判断 =====
+    
     local function isMobile()
         return UserInputService.TouchEnabled and not UserInputService.MouseEnabled
     end
     
     local mobile = isMobile()
-    local scale = mobile and 0.6 or 1  -- 手机端缩放 60%
+    local scale = mobile and 0.6 or 1  
     
-    -- ===== 背景模糊效果 =====
+    
     local blurEffect = Instance.new("BlurEffect")
     blurEffect.Name = "ChronixLoading_Blur"
     blurEffect.Size = 0
     blurEffect.Parent = Lighting
     
-    -- 模糊渐入动画
+    
     local blurTween = TweenService:Create(blurEffect,
         TweenInfo.new(0.5, Enum.EasingStyle.Quad, Enum.EasingDirection.Out),
         {Size = 12}
     )
     blurTween:Play()
     
-    -- 创建主屏幕容器
+    
     local Screen = Instance.new("ScreenGui")
     Screen.Name = "ChronixUILoading"
     Screen.ResetOnSpawn = false
@@ -77,18 +77,18 @@ function LoadingAnimation:Play(config)
         Screen.Parent = gethui and gethui() or cloneref(game.CoreGui)
     end
     
-    -- 主屏幕背景（半透明黑色遮罩，配合模糊效果）
+    
     local MainFrame = Instance.new("Frame")
     MainFrame.Name = "MainFrame"
     MainFrame.Size = UDim2.new(1, 0, 1, 0)
     MainFrame.Position = UDim2.new(0, 0, 0, 0)
     MainFrame.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
-    MainFrame.BackgroundTransparency = 1  -- 初始透明
+    MainFrame.BackgroundTransparency = 1  
     MainFrame.BorderSizePixel = 0
     MainFrame.ClipsDescendants = true
     MainFrame.Parent = Screen
     
-    -- 氛围光晕（根据屏幕大小调整）
+    
     local glowSize = mobile and 1.5 or 1
     local GlowAmbient = Instance.new("Frame")
     GlowAmbient.Name = "GlowAmbient"
@@ -108,7 +108,7 @@ function LoadingAnimation:Play(config)
     GlowColor.ZIndex = 25
     GlowColor.Parent = GlowAmbient
     
-    -- 加载内容包装器
+    
     local LoaderWrapper = Instance.new("Frame")
     LoaderWrapper.Name = "LoaderWrapper"
     LoaderWrapper.Size = UDim2.new(1, 0, 1, 0)
@@ -117,7 +117,7 @@ function LoadingAnimation:Play(config)
     LoaderWrapper.ZIndex = 30
     LoaderWrapper.Parent = MainFrame
     
-    -- ===== 手机端适配：调整内容组尺寸和位置 =====
+    
     local contentWidth = mobile and 280 or 400
     local contentHeight = mobile and 45 or 60
     
@@ -129,7 +129,7 @@ function LoadingAnimation:Play(config)
     ContentGroup.BorderSizePixel = 0
     ContentGroup.Parent = LoaderWrapper
     
-    -- ===== 手机端适配：圆点容器尺寸 =====
+    
     local dotContainerSize = mobile and 45 or 60
     
     local DotContainer = Instance.new("Frame")
@@ -140,7 +140,7 @@ function LoadingAnimation:Play(config)
     DotContainer.BorderSizePixel = 0
     DotContainer.Parent = ContentGroup
     
-    -- ===== 手机端适配：主圆点尺寸 =====
+    
     local dot1Size = mobile and 14 or 20
     local dot1Half = dot1Size / 2
     
@@ -158,7 +158,7 @@ function LoadingAnimation:Play(config)
     Dot1Corner.CornerRadius = UDim.new(1, 0)
     Dot1Corner.Parent = Dot1
     
-    -- 脉冲波纹1
+    
     local Dot2 = Instance.new("Frame")
     Dot2.Name = "Dot2"
     Dot2.Size = UDim2.new(0, dot1Size, 0, dot1Size)
@@ -173,7 +173,7 @@ function LoadingAnimation:Play(config)
     Dot2Corner.CornerRadius = UDim.new(1, 0)
     Dot2Corner.Parent = Dot2
     
-    -- 脉冲波纹2
+    
     local Dot3 = Instance.new("Frame")
     Dot3.Name = "Dot3"
     Dot3.Size = UDim2.new(0, dot1Size, 0, dot1Size)
@@ -188,7 +188,7 @@ function LoadingAnimation:Play(config)
     Dot3Corner.CornerRadius = UDim.new(1, 0)
     Dot3Corner.Parent = Dot3
     
-    -- ===== 手机端适配：标题文字 =====
+    
     local titleFontSize = mobile and 28 or 42
     local titleWidth = mobile and 220 or 300
     local titleOffset = mobile and 80 or 70
@@ -206,7 +206,7 @@ function LoadingAnimation:Play(config)
     BrandTitle.TextXAlignment = Enum.TextXAlignment.Left
     BrandTitle.Parent = ContentGroup
     
-    -- ===== 手机端适配：底部信息 =====
+    
     local footerWidth = mobile and 200 or 260
     local footerYOffset = mobile and -80 or -120
     
@@ -220,7 +220,7 @@ function LoadingAnimation:Play(config)
     LoadingFooter.Visible = false
     LoadingFooter.Parent = MainFrame
     
-    -- 加载文字
+    
     local LoadingText = Instance.new("TextLabel")
     LoadingText.Name = "LoadingText"
     LoadingText.Size = UDim2.new(1, 0, 0, 24 * scale)
@@ -233,7 +233,7 @@ function LoadingAnimation:Play(config)
     LoadingText.TextTransparency = 1
     LoadingText.Parent = LoadingFooter
     
-    -- 进度条容器
+    
     local ProgressContainer = Instance.new("Frame")
     ProgressContainer.Name = "ProgressContainer"
     ProgressContainer.Size = UDim2.new(1, 0, 0, 3 * scale)
@@ -247,7 +247,7 @@ function LoadingAnimation:Play(config)
     ProgressCorner.CornerRadius = UDim.new(0, 20 * scale)
     ProgressCorner.Parent = ProgressContainer
     
-    -- 进度条填充
+    
     local ProgressFill = Instance.new("Frame")
     ProgressFill.Name = "ProgressFill"
     ProgressFill.Size = UDim2.new(0, 0, 1, 0)
@@ -259,7 +259,7 @@ function LoadingAnimation:Play(config)
     FillCorner.CornerRadius = UDim.new(0, 20 * scale)
     FillCorner.Parent = ProgressFill
     
-    -- ===== 手机端适配：READY文字 =====
+    
     local readyFontSize = mobile and 20 or 28
     
     local CompleteText = Instance.new("TextLabel")
@@ -277,7 +277,7 @@ function LoadingAnimation:Play(config)
     CompleteText.Visible = false
     CompleteText.Parent = MainFrame
     
-    -- ===== 手机端适配：角落装饰 =====
+    
     local decoFontSize = mobile and 8 or 10
     local deco1Width = mobile and 80 or 100
     local deco2Width = mobile and 50 or 60
@@ -310,8 +310,8 @@ function LoadingAnimation:Play(config)
     CornerDeco2.ZIndex = 40
     CornerDeco2.Parent = MainFrame
     
-    -- ========== 脉冲动画（手机端适配脉冲范围） ==========
-    local pulseMaxSize = mobile and 25 or 35  -- 手机端脉冲范围缩小
+    
+    local pulseMaxSize = mobile and 25 or 35  
     local pulseTime1 = 0
     local pulseTime2 = 0.4
     local pulseConnection
@@ -376,15 +376,15 @@ function LoadingAnimation:Play(config)
         end
     end
     
-    -- 动画完成标志
+    
     local animationFinished = false
     
-    -- 在后台线程播放动画
+    
     task.spawn(function()
-        -- 背景和脉冲点同时隐出
+        
         local bgFadeIn = TweenService:Create(MainFrame,
             TweenInfo.new(0.5, Enum.EasingStyle.Quad, Enum.EasingDirection.Out),
-            {BackgroundTransparency = 0.3}  -- 改为半透明，配合模糊效果
+            {BackgroundTransparency = 0.3}  
         )
         
         local dot1FadeIn = TweenService:Create(Dot1,
@@ -398,10 +398,10 @@ function LoadingAnimation:Play(config)
         
         task.wait(0.5)
         
-        -- ===== 手机端适配：移动距离 =====
-        local moveTargetX = 0  -- 手机端移动距离减小
         
-        -- 脉冲点向左移动
+        local moveTargetX = 0  
+        
+        
         local moveContainer = TweenService:Create(DotContainer,
             TweenInfo.new(1.2, Enum.EasingStyle.Cubic, Enum.EasingDirection.Out),
             {Position = UDim2.new(0, moveTargetX, 0.5, -dotContainerSize/2)}
@@ -410,7 +410,7 @@ function LoadingAnimation:Play(config)
         
         task.wait(1.2)
         
-        -- 标题和底部信息隐出
+        
         local titleFadeIn = TweenService:Create(BrandTitle,
             TweenInfo.new(0.6, Enum.EasingStyle.Quad, Enum.EasingDirection.Out),
             {TextTransparency = 0}
@@ -424,14 +424,14 @@ function LoadingAnimation:Play(config)
         )
         loadingTextFadeIn:Play()
         
-        -- 进度条增长
+        
         local progressTween = TweenService:Create(ProgressFill,
             TweenInfo.new(2.0, Enum.EasingStyle.Linear, Enum.EasingDirection.Out),
             {Size = UDim2.new(1, 0, 1, 0)}
         )
         progressTween:Play()
 
-        -- ===== 背景音乐 =====
+        
         local musicSound = Instance.new("Sound")
         musicSound.SoundId = "rbxassetid://78445646113906"
         musicSound.Volume = 1
@@ -439,7 +439,7 @@ function LoadingAnimation:Play(config)
         musicSound.Parent = cloneref(game:GetService("SoundService"))
         musicSound:Play()
         
-        -- 装饰淡入
+        
         local deco1FadeIn = TweenService:Create(CornerDeco1,
             TweenInfo.new(0.6, Enum.EasingStyle.Quad, Enum.EasingDirection.Out),
             {TextTransparency = 0.6}
@@ -453,7 +453,7 @@ function LoadingAnimation:Play(config)
         
         task.wait(2.0)
         
-        -- 开始内容隐出
+        
         fadeOutPulse()
         
         local dot1FadeOut = TweenService:Create(Dot1,
@@ -520,7 +520,7 @@ function LoadingAnimation:Play(config)
         )
         bgFadeOut:Play()
 
-        -- 同时淡出模糊效果
+        
         local blurFadeOut = TweenService:Create(blurEffect,
             TweenInfo.new(0.7, Enum.EasingStyle.Quad, Enum.EasingDirection.Out),
             {Size = 0}
@@ -529,8 +529,8 @@ function LoadingAnimation:Play(config)
         
         task.wait(0.6)
         
-        -- 清理
-        -- 停止音乐
+        
+        
         if musicSound then
             musicSound:Stop()
             musicSound:Destroy()
@@ -549,18 +549,18 @@ function LoadingAnimation:Play(config)
         end
     }
 end
--- ========== 加载动画模块结束 ==========
 
--- ========== 多图标库集成模块 ==========
+
+
 local cloneref = cloneref or clonereference or function(instance)
     return instance
 end
 
 local IconModule = {
-    -- 默认图标类型
+    
     DefaultType = "lucide",
     
-    -- 所有可用的图标库
+    
     AvailableTypes = {
         "lucide",
         "solar", 
@@ -571,15 +571,15 @@ local IconModule = {
         "other",
     },
     
-    -- 存储所有图标数据
+    
     Icons = {},
     
-    -- 加载状态
+    
     Loaded = {},
     IsLoading = {},
 }
 
--- 异步加载指定类型的图标库
+
 function IconModule:LoadIconSet(iconType)
     if self.Loaded[iconType] or self.IsLoading[iconType] then
         return
@@ -603,25 +603,25 @@ function IconModule:LoadIconSet(iconType)
     end)
 end
 
--- 加载所有图标库
+
 function IconModule:LoadAll()
     for _, iconType in ipairs(self.AvailableTypes) do
         self:LoadIconSet(iconType)
     end
 end
 
--- 设置默认图标类型
+
 function IconModule:SetDefaultType(iconType)
     if table.find(self.AvailableTypes, iconType) then
         self.DefaultType = iconType
     end
 end
 
--- 获取图标（支持指定类型）
+
 function IconModule:GetIcon(iconName, iconType)
     iconType = iconType or self.DefaultType
     
-    -- 如果还没加载，尝试同步加载（可能会阻塞，所以只做 fallback）
+    
     if not self.Loaded[iconType] then
         self:LoadIconSet(iconType)
         return nil
@@ -632,12 +632,12 @@ function IconModule:GetIcon(iconName, iconType)
         return nil
     end
     
-    -- 直接返回资产 ID
+    
     if iconSet[iconName] and type(iconSet[iconName]) == "string" and iconSet[iconName]:find("rbxassetid://") then
         return iconSet[iconName]
     end
     
-    -- 如果是复杂格式，提取 Image 字段
+    
     if iconSet.Icons and iconSet.Icons[iconName] then
         return iconSet.Icons[iconName].Image
     end
@@ -645,13 +645,13 @@ function IconModule:GetIcon(iconName, iconType)
     return nil
 end
 
--- 检查图标是否已加载
+
 function IconModule:IsIconLoaded(iconName, iconType)
     iconType = iconType or self.DefaultType
     return self.Loaded[iconType] and self:GetIcon(iconName, iconType) ~= nil
 end
 
--- 创建图标 ImageLabel
+
 function IconModule:CreateIcon(iconName, size, color, iconType)
     local iconId = self:GetIcon(iconName, iconType)
     if not iconId then
@@ -671,7 +671,7 @@ function IconModule:CreateIcon(iconName, size, color, iconType)
     return iconLabel
 end
 
--- 等待图标加载完成（异步）
+
 function IconModule:WaitForIcon(iconName, iconType, callback)
     iconType = iconType or self.DefaultType
     
@@ -690,11 +690,11 @@ function IconModule:WaitForIcon(iconName, iconType, callback)
     end)
 end
 
--- 启动加载所有图标库
-IconModule:LoadAll()
--- ========== 多图标库集成结束 ==========
 
--- 设备类型判断
+IconModule:LoadAll()
+
+
+
 local function GetDeviceType()
     if UserInputService.TouchEnabled and not UserInputService.MouseEnabled then
         return "Mobile"
@@ -707,7 +707,7 @@ local function GetDeviceType()
     end
 end
 
--- 主题颜色配置
+
 ChronixUI.Themes = {
     Default = {
         Background = Color3.fromRGB(30, 30, 46),
@@ -748,7 +748,7 @@ ChronixUI.Themes = {
 }
 ChronixUI.CurrentTheme = "Default"
 
--- 音效
+
 local function PlayClickSound()
     local sound = Instance.new("Sound")
     sound.SoundId = "rbxassetid://535716488"
@@ -758,12 +758,12 @@ local function PlayClickSound()
     game.Debris:AddItem(sound, 2)
 end
 
--- 获取玩家头像
+
 local function GetPlayerAvatar(userId)
     return "https://www.roblox.com/avatar-thumbnail/image?userId=" .. userId .. "&width=420&height=420&format=png"
 end
 
--- 辅助函数
+
 local function CreateFrame(parent, size, position, color, transparency)
     local frame = Instance.new("Frame")
     frame.Parent = parent
@@ -808,7 +808,7 @@ local function AddListLayout(parent, padding, order)
     return layout
 end
 
--- 包装 Instance，使其支持 :Destroy() 方法，同时方法调用正确转发
+
 local function wrapInstance(instance)
     local proxy = {
         _instance = instance,
@@ -835,12 +835,12 @@ local function wrapInstance(instance)
     })
 end
 
--- ========== 通知系统（原封不动整合版 + 手机适配） ==========
+
 local notifications = {}
 local notificationScreenGui = nil
 local notificationContainer = nil
 
--- 通知系统配置
+
 local notificationConfig = {
     notificationWidth = 400,
     notificationHeight = 150,
@@ -848,13 +848,13 @@ local notificationConfig = {
     defaultDuration = 4,
 }
 
--- 获取缩放比例
+
 local function getScale()
     local isMobile = (UserInputService.TouchEnabled and not UserInputService.MouseEnabled)
     return isMobile and 0.5 or 1
 end
 
--- 初始化通知 GUI
+
 local function initNotificationScreenGui()
     if notificationScreenGui then return true end
 
@@ -872,7 +872,7 @@ local function initNotificationScreenGui()
         notificationScreenGui.Parent = gethui and gethui() or cloneref(game.CoreGui)
     end
 
-    -- 右侧中间位置的容器
+    
     notificationContainer = Instance.new("Frame")
     notificationContainer.Name = "Container"
     notificationContainer.BackgroundTransparency = 1
@@ -884,7 +884,7 @@ local function initNotificationScreenGui()
     return true
 end
 
--- 根据类型获取颜色（适配 UI 库主题）
+
 local function getColorByType(notifType)
     local theme = ChronixUI.Themes[ChronixUI.CurrentTheme]
     if notifType == "info" then
@@ -900,11 +900,11 @@ local function getColorByType(notifType)
     end
 end
 
--- 创建单个通知
+
 local function createNotificationFrame(title, text, color)
     local scale = getScale()
     
-    -- 外层容器（用于裁剪动画）
+    
     local clipFrame = Instance.new("Frame")
     clipFrame.Name = "ClipFrame"
     clipFrame.Size = UDim2.new(1, 0, 0, notificationConfig.notificationHeight * scale)
@@ -912,16 +912,16 @@ local function createNotificationFrame(title, text, color)
     clipFrame.BorderSizePixel = 0
     clipFrame.ClipsDescendants = true
     
-    -- 内层通知（实际内容）
+    
     local frame = Instance.new("Frame")
     frame.Name = "NotificationFrame"
     frame.Size = UDim2.new(1, 0, 1, 0)
-    frame.Position = UDim2.new(1, 0, 0, 0) -- 初始在右侧外
+    frame.Position = UDim2.new(1, 0, 0, 0) 
     frame.BackgroundColor3 = Color3.fromRGB(26, 26, 29)
     frame.BorderSizePixel = 0
     frame.Parent = clipFrame
     
-    -- 渐变效果（从右到左）
+    
     local uiGradient = Instance.new("UIGradient")
     uiGradient.Rotation = 180
     uiGradient.Transparency = NumberSequence.new({
@@ -932,7 +932,7 @@ local function createNotificationFrame(title, text, color)
     })
     uiGradient.Parent = frame
     
-    -- 标题
+    
     local titleLabel = Instance.new("TextLabel")
     titleLabel.Text = title
     titleLabel.TextColor3 = color
@@ -944,7 +944,7 @@ local function createNotificationFrame(title, text, color)
     titleLabel.Position = UDim2.new(0, 34 * scale, 0, 20 * scale)
     titleLabel.Parent = frame
     
-    -- 横线
+    
     local line = Instance.new("Frame")
     line.BackgroundColor3 = color
     line.BorderSizePixel = 0
@@ -952,7 +952,7 @@ local function createNotificationFrame(title, text, color)
     line.Position = UDim2.new(0, 34 * scale, 0, 50 * scale)
     line.Parent = frame
     
-    -- 内容
+    
     local contentLabel = Instance.new("TextLabel")
     contentLabel.Text = text
     contentLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
@@ -969,7 +969,7 @@ local function createNotificationFrame(title, text, color)
     return clipFrame, frame
 end
 
--- 计算所有通知的总高度和起始位置
+
 local function calculateLayout()
     if #notifications == 0 then return 0 end
     
@@ -982,7 +982,7 @@ local function calculateLayout()
     return startY
 end
 
--- 更新所有通知位置
+
 local function updateAllPositions()
     local startY = calculateLayout()
     local scale = getScale()
@@ -997,7 +997,7 @@ local function updateAllPositions()
     end
 end
 
--- 播放通知音效
+
 local function playNotificationSound(notifType)
     local soundsid = "rbxassetid://4590662766"
     if notifType == "info" then
@@ -1017,45 +1017,45 @@ local function playNotificationSound(notifType)
     game.Debris:AddItem(sound, 2)
 end
 
--- 核心通知函数
+
 function ChronixUI:Notify(config)
     local title = config.Title or "通知"
     local content = config.Content or ""
     local duration = config.Duration or notificationConfig.defaultDuration
     local notifType = config.Type or "info"
     
-    -- 确保容器存在
+    
     if not notificationContainer then
         initNotificationScreenGui()
     end
     
-    -- 获取颜色
+    
     local color = getColorByType(notifType)
     
-    -- 创建通知
+    
     local clipFrame, innerFrame = createNotificationFrame(title, content, color)
     clipFrame.Parent = notificationContainer
     
-    -- 创建通知对象
+    
     local notification = {
         clipFrame = clipFrame,
         innerFrame = innerFrame,
         duration = duration
     }
     
-    -- 添加到通知列表
+    
     table.insert(notifications, notification)
     
-    -- 播放音效
+    
     playNotificationSound(notifType)
     
-    -- 更新所有位置
+    
     updateAllPositions()
     
-    -- 等待一帧确保渲染完成
+    
     RunService.Heartbeat:Wait()
     
-    -- 使用 RunService 实现自定义动画（替代 TweenService）
+    
     local startTime = tick()
     local animationDuration = 0.5
     local startX = 1
@@ -1064,7 +1064,7 @@ function ChronixUI:Notify(config)
     coroutine.wrap(function()
         while tick() - startTime < animationDuration do
             local alpha = (tick() - startTime) / animationDuration
-            -- 缓动函数：easeOutQuad
+            
             local easedAlpha = 1 - (1 - alpha) * (1 - alpha)
             local currentX = startX + (endX - startX) * easedAlpha
             
@@ -1075,18 +1075,18 @@ function ChronixUI:Notify(config)
             RunService.Heartbeat:Wait()
         end
         
-        -- 确保最终位置正确
+        
         if innerFrame and innerFrame.Parent then
             innerFrame.Position = UDim2.new(0, 0, 0, 0)
         end
     end)()
     
-    -- 处理通知生命周期
+    
     coroutine.wrap(function()
-        -- 等待显示时间
+        
         task.wait(duration)
         
-        -- 检查通知是否仍然有效
+        
         if not clipFrame or not clipFrame.Parent then
             local index = table.find(notifications, notification)
             if index then
@@ -1096,7 +1096,7 @@ function ChronixUI:Notify(config)
             return
         end
         
-        -- 使用自定义动画滑出
+        
         local exitStartTime = tick()
         local exitDuration = 0.5
         local exitStartX = 0
@@ -1104,7 +1104,7 @@ function ChronixUI:Notify(config)
         
         while tick() - exitStartTime < exitDuration do
             local alpha = (tick() - exitStartTime) / exitDuration
-            -- 缓动函数：easeInQuad
+            
             local easedAlpha = alpha * alpha
             local currentX = exitStartX + (exitEndX - exitStartX) * easedAlpha
             
@@ -1115,26 +1115,26 @@ function ChronixUI:Notify(config)
             RunService.Heartbeat:Wait()
         end
         
-        -- 从列表中移除
+        
         local index = table.find(notifications, notification)
         if index then
             table.remove(notifications, index)
         end
         
-        -- 销毁通知
+        
         if clipFrame and clipFrame.Parent then
             clipFrame:Destroy()
         end
         
-        -- 更新其他通知位置
+        
         updateAllPositions()
     end)()
     
     return notification
 end
--- ========== 通知系统结束 ==========
 
--- 窗口拖动功能（修复断开问题，使用全局 InputEnded 监听）
+
+
 local function MakeDraggable(frame, dragHandle)
     local dragging = false
     local dragStart, startPos
@@ -1156,7 +1156,7 @@ local function MakeDraggable(frame, dragHandle)
     end
 
     dragHandle.InputBegan:Connect(beginDrag)
-    -- 使用全局 InputEnded 确保无论鼠标/手指在何处松开都能正确结束拖动
+    
     UserInputService.InputEnded:Connect(endDrag)
 
     UserInputService.InputChanged:Connect(function(input)
@@ -1168,21 +1168,21 @@ local function MakeDraggable(frame, dragHandle)
     end)
 end
 
--- 创建主窗口
+
 function ChronixUI:CreateWindow(config)
     config = config or {}
-    -- ===== 新增：播放加载动画 =====
+    
     local animation = LoadingAnimation:Play({
         Name = config.Name or "Chronix UI",
         ShowLoadingAnimation = config.ShowLoadingAnimation or false
     })
     
-    -- 等待动画完成后再继续创建 UI
+    
     animation:Wait()
-    -- ===== 新增结束 =====
+    
     
     local isMobile = (GetDeviceType() == "Mobile")
-    local scale = isMobile and 0.7 or 1          -- 手机端缩放 70%
+    local scale = isMobile and 0.7 or 1          
 
     local defaultWidth = 680
     local defaultHeight = 420
@@ -1202,28 +1202,28 @@ function ChronixUI:CreateWindow(config)
         gui.Parent = gethui and gethui() or cloneref(game.CoreGui)
     end
 
-    -- 创建模糊效果（放在 Lighting 中才能模糊 3D 场景）
+    
     local blurEffect = nil
     local function createBlurEffect()
         if blurEffect then return blurEffect end
         blurEffect = Instance.new("BlurEffect")
         blurEffect.Name = "ChronixUI_Blur"
-        blurEffect.Size = 0  -- 初始为0
+        blurEffect.Size = 0  
         blurEffect.Parent = Lighting
         return blurEffect
     end
 
-    -- 平滑模糊控制
+    
     local blurTween = nil
     local function setBlur(enabled, instant)
         local blur = createBlurEffect()
         
-        -- 计算目标模糊程度
+        
         local targetSize = 0
         if enabled and ChronixUI.Settings.BackgroundBlur then
             targetSize = ChronixUI.Settings.BlurSize
         else
-            targetSize = 0  -- 关闭或禁用时都设为 0
+            targetSize = 0  
         end
         
         if instant then
@@ -1249,16 +1249,16 @@ function ChronixUI:CreateWindow(config)
     local originalSize = windowSize
     local savedPosition = mainFrame.Position
 
-    -- 使用 ContextActionService 绑定快捷键
+    
     local toggleActionName = "ChronixUIToggle_" .. tostring(#self.Windows + 1)
     ContextActionService:BindAction(toggleActionName, function(actionName, inputState, inputObject)
         if inputState == Enum.UserInputState.Begin then
             if inputObject.KeyCode == self.Settings.ToggleKey then
                 windowVisible = not windowVisible
                 if windowVisible then
-                    setBlur(true, false)  -- 显示菜单时开启模糊
+                    setBlur(true, false)  
                 else
-                    setBlur(false, false) -- 隐藏菜单时关闭模糊
+                    setBlur(false, false) 
                 end
                 mainFrame.Visible = windowVisible
                 if not windowVisible and self.Settings.FirstHide then
@@ -1276,13 +1276,13 @@ function ChronixUI:CreateWindow(config)
         return Enum.ContextActionResult.Pass
     end, false, self.Settings.ToggleKey)
 
-    -- 标题栏
+    
     local titleBarHeight = math.floor(45 * scale)
     local titleBar = CreateFrame(mainFrame, UDim2.new(1, 0, 0, titleBarHeight), UDim2.new(0, 0, 0, 0),
                                   self.Themes[self.CurrentTheme].Background, 1)
     MakeDraggable(mainFrame, titleBar)
 
-    -- 监听拖动，保存位置
+    
     local function savePosition()
         if not minimized then
             savedPosition = mainFrame.Position
@@ -1290,12 +1290,12 @@ function ChronixUI:CreateWindow(config)
     end
     mainFrame:GetPropertyChangedSignal("Position"):Connect(savePosition)
 
-    -- 标题文字
+    
     local titleFontSize = math.floor(18 * scale)
     local titleLabel = CreateLabel(titleBar, windowName, UDim2.new(1, -140*scale, 1, 0), UDim2.new(0, 20*scale, 0, 0),
                                     self.Themes[self.CurrentTheme].Accent, titleFontSize, Enum.Font.GothamBold)
 
-    -- 按钮容器
+    
     local buttonContainer = Instance.new("Frame")
     buttonContainer.Size = UDim2.new(0, 120*scale, 1, 0)
     buttonContainer.Position = UDim2.new(1, -130*scale, 0, 0)
@@ -1305,7 +1305,7 @@ function ChronixUI:CreateWindow(config)
     local btnSize = math.floor(32 * scale)
     local btnOffset = math.floor(38 * scale)
 
-    -- 设置按钮
+    
     local settingsBtn = Instance.new("TextButton")
     settingsBtn.Size = UDim2.new(0, btnSize, 0, btnSize)
     settingsBtn.Position = UDim2.new(0, 0, 0.5, -btnSize/2)
@@ -1320,7 +1320,7 @@ function ChronixUI:CreateWindow(config)
     settingsCorner.Parent = settingsBtn
     AddStroke(settingsBtn, self.Themes[self.CurrentTheme].Border)
 
-    -- 最小化按钮
+    
     local minBtn = Instance.new("TextButton")
     minBtn.Size = UDim2.new(0, btnSize, 0, btnSize)
     minBtn.Position = UDim2.new(0, btnOffset, 0.5, -btnSize/2)
@@ -1335,7 +1335,7 @@ function ChronixUI:CreateWindow(config)
     minCorner.Parent = minBtn
     AddStroke(minBtn, self.Themes[self.CurrentTheme].Border)
 
-    -- 关闭按钮
+    
     local closeBtn = Instance.new("TextButton")
     closeBtn.Size = UDim2.new(0, btnSize, 0, btnSize)
     closeBtn.Position = UDim2.new(0, btnOffset*2, 0.5, -btnSize/2)
@@ -1350,13 +1350,13 @@ function ChronixUI:CreateWindow(config)
     closeCorner.Parent = closeBtn
     AddStroke(closeBtn, self.Themes[self.CurrentTheme].Border)
 
-    -- 底部玩家信息栏
+    
     local playerBarHeight = math.floor(50 * scale)
     local playerBar = CreateFrame(mainFrame, UDim2.new(1, 0, 0, playerBarHeight), UDim2.new(0, 0, 1, -playerBarHeight),
                                    self.Themes[self.CurrentTheme].Card)
     AddStroke(playerBar, self.Themes[self.CurrentTheme].Border)
 
-    -- 头像容器
+    
     local avatarSize = math.floor(36 * scale)
     local avatarContainer = Instance.new("Frame")
     avatarContainer.Size = UDim2.new(0, avatarSize, 0, avatarSize)
@@ -1382,7 +1382,7 @@ function ChronixUI:CreateWindow(config)
     premiumBadge.Name = "PremiumBadge"
     premiumBadge.Size = UDim2.new(0, math.floor(12 * scale), 0, math.floor(12 * scale))
     premiumBadge.Position = UDim2.new(1, math.floor(-4 * scale), 1, math.floor(-4 * scale))
-    premiumBadge.AnchorPoint = Vector2.new(1, 1)      -- 锚点在右下角
+    premiumBadge.AnchorPoint = Vector2.new(1, 1)      
     premiumBadge.BackgroundTransparency = 1
     premiumBadge.Image = "rbxassetid://126540142153628"
     premiumBadge.ImageTransparency = 0.15
@@ -1390,14 +1390,14 @@ function ChronixUI:CreateWindow(config)
     premiumBadge.Visible = (LocalPlayer.MembershipType == Enum.MembershipType.Premium)
     premiumBadge.Parent = avatarContainer
 
-    -- 玩家名称和游戏信息（稍后填充）
+    
     local playerNameLabel = CreateLabel(playerBar, "", UDim2.new(0, 200*scale, 0, math.floor(24 * scale)), UDim2.new(0, 60*scale, 0, 8*scale),
                                          self.Themes[self.CurrentTheme].Text, math.floor(16 * scale), Enum.Font.GothamBold)
     local playerInfoLabel = CreateLabel(playerBar, "", UDim2.new(0, 200*scale, 0, math.floor(20 * scale)), UDim2.new(0, 60*scale, 0, 30*scale),
                                          self.Themes[self.CurrentTheme].TextDark, math.floor(12 * scale), 12)
     playerInfoLabel.Name = "PlayerInfoLabel"
 
-    -- 获取游戏名的函数（需在 safePlayerInfo 前定义）
+    
     local gameInfoCache = nil
     local function getGameName(universeId)
         if gameInfoCache then return gameInfoCache end
@@ -1415,7 +1415,7 @@ function ChronixUI:CreateWindow(config)
         return nil
     end
     
-    -- 安全获取玩家信息
+    
     local function updatePlayerInfoDisplay()
         local player = Players.LocalPlayer
         if not player then return end
@@ -1423,13 +1423,13 @@ function ChronixUI:CreateWindow(config)
         local platformInfo = UserInputService:GetPlatform().Name
 
         if ChronixUI.Settings.PrivacyMode then
-            -- 隐私模式：显示遮盖字符
+            
             playerNameLabel.Text = "####################"
             playerInfoLabel.Text = "####################"
             premiumBadge.Image = ""
             avatarImage.Image = ""
         else
-            -- 正常模式：显示真实信息
+            
             premiumBadge.Image = "rbxassetid://126540142153628"
             avatarImage.Image = GetPlayerAvatar(LocalPlayer.UserId)
 
@@ -1454,10 +1454,10 @@ function ChronixUI:CreateWindow(config)
         end
     end
 
-    -- 初始化时调用
+    
     updatePlayerInfoDisplay()
 
-    -- 侧边栏
+    
     local sidebarWidth = math.floor(160 * scale)
     local sidebar = CreateFrame(mainFrame, UDim2.new(0, sidebarWidth, 1, -playerBarHeight - titleBarHeight), UDim2.new(0, 0, 0, titleBarHeight),
                                  self.Themes[self.CurrentTheme].Sidebar)
@@ -1477,13 +1477,13 @@ function ChronixUI:CreateWindow(config)
 
     local tabList = AddListLayout(tabContainer, math.floor(8 * scale))
 
-    -- 更新侧边栏滚动区域
+    
     local function updateSidebarCanvas()
         tabContainer.CanvasSize = UDim2.new(0, 0, 0, tabList.AbsoluteContentSize.Y + 20*scale)
     end
     tabList:GetPropertyChangedSignal("AbsoluteContentSize"):Connect(updateSidebarCanvas)
 
-    -- 内容区域
+    
     local contentArea = CreateFrame(mainFrame, UDim2.new(1, -sidebarWidth, 1, -playerBarHeight - titleBarHeight), UDim2.new(0, sidebarWidth, 0, titleBarHeight),
                                      self.Themes[self.CurrentTheme].Background, 1)
 
@@ -1503,16 +1503,16 @@ function ChronixUI:CreateWindow(config)
     contentPadding.PaddingBottom = UDim.new(0, math.floor(20 * scale))
     contentPadding.Parent = contentScroll
 
-    -- 更新内容区域滚动
+    
     local function updateContentCanvas()
         contentScroll.CanvasSize = UDim2.new(0, 0, 0, contentLayout.AbsoluteContentSize.Y + 40*scale)
     end
     contentLayout:GetPropertyChangedSignal("AbsoluteContentSize"):Connect(updateContentCanvas)
 
-    -- 关闭按钮事件
+    
     closeBtn.MouseButton1Click:Connect(function()
         PlayClickSound()
-        -- 关闭模糊效果
+        
         if blurEffect then
             blurEffect:Destroy()
             blurEffect = nil
@@ -1537,7 +1537,7 @@ function ChronixUI:CreateWindow(config)
         end
     end)
 
-    -- 窗口数据对象
+    
     local windowData = {
         Gui = gui,
         MainFrame = mainFrame,
@@ -1551,26 +1551,26 @@ function ChronixUI:CreateWindow(config)
         UpdateTheme = nil
     }
 
-        -- 主题更新函数
+        
     function windowData:UpdateTheme(themeName)
         local theme = ChronixUI.Themes[themeName]
         if not theme then return false end
         
-        -- 1. 更新主框架背景和边框描边
+        
         mainFrame.BackgroundColor3 = theme.Background
         local mainStroke = mainFrame:FindFirstChildOfClass("UIStroke")
         if mainStroke then
             mainStroke.Color = theme.Border
         end
         
-        -- 2. 更新侧边栏
+        
         sidebar.BackgroundColor3 = theme.Sidebar
         sidebarTitle.TextColor3 = theme.Accent
         
-        -- 3. 更新标题栏文字颜色
+        
         titleLabel.TextColor3 = theme.Accent
         
-        -- 4. 更新右上角按钮样式
+        
         local function updateButtonStyle(btn)
             btn.BackgroundColor3 = theme.Card
             btn.TextColor3 = theme.Text
@@ -1583,7 +1583,7 @@ function ChronixUI:CreateWindow(config)
         updateButtonStyle(minBtn)
         updateButtonStyle(closeBtn)
         
-        -- 5. 更新底部玩家信息栏
+        
         playerBar.BackgroundColor3 = theme.Card
         local barStroke = playerBar:FindFirstChildOfClass("UIStroke")
         if barStroke then
@@ -1595,25 +1595,25 @@ function ChronixUI:CreateWindow(config)
         playerNameLabel.TextColor3 = theme.Text
         playerInfoLabel.TextColor3 = theme.TextDark
         
-        -- 6. 更新粒子系统颜色
+        
         if self.ParticleSystem then
             self.ParticleSystem:setColor(theme.Accent)
         end
         
-        -- 7. 更新所有Tab按钮样式
+        
         for _, tabData in pairs(self.Tabs) do
             if tabData.Button then
                 tabData.Button.BackgroundColor3 = theme.Card
                 tabData.Button.TextColor3 = theme.TextDark
             end
             
-            -- 当前选中的Tab保持高亮
+            
             if self.CurrentTab and self.CurrentTab.Name == tabData.Name then
                 tabData.Button.BackgroundColor3 = theme.Accent
                 tabData.Button.TextColor3 = Color3.fromRGB(0, 0, 0)
             end
             
-            -- 递归更新Tab内容区域
+            
             local function updateElementColors(obj)
                 if obj:IsA("TextLabel") or obj:IsA("TextButton") or obj:IsA("TextBox") then
                     if obj:IsA("TextButton") then
@@ -1653,7 +1653,7 @@ function ChronixUI:CreateWindow(config)
             updateElementColors(tabData.Content)
         end
         
-        -- 8. 单独处理设置页
+        
         if self.SettingsTabContent then
             local function updateSettingsColors(obj)
                 if obj:IsA("TextLabel") or obj:IsA("TextButton") or obj:IsA("TextBox") then
@@ -1680,8 +1680,8 @@ function ChronixUI:CreateWindow(config)
         return true
     end
 
-    -- ========== 在这里添加粒子系统 ==========
-    -- 在 windowData 定义之后添加
+    
+    
     if UIParticleSystem then
         local particleBgFrame = Instance.new("Frame")
         particleBgFrame.Name = "ParticleBackground"
@@ -1698,13 +1698,13 @@ function ChronixUI:CreateWindow(config)
             windowData.ParticleSystem:setColor(self.Themes[self.CurrentTheme].Accent)
         end
     end
-    -- ========== 粒子系统添加结束 ==========
+    
 
-    -- 最小化功能
+    
     minBtn.MouseButton1Click:Connect(function()
         PlayClickSound()
         windowData.Minimized = not windowData.Minimized
-        -- 最小化时关闭模糊，还原时开启模糊
+        
     if windowData.Minimized then
         setBlur(false, false)
     else
@@ -1734,18 +1734,18 @@ function ChronixUI:CreateWindow(config)
         end
     end)
 
-    -- 创建 Tab 函数
+    
     function windowData:CreateTab(tabConfig)
         local tabName = tabConfig.Name or "Tab"
         local isSettings = tabConfig.IsSettings or false
 
-        -- 图标配置
+        
         local hasIcon = tabConfig.HasIcon or false
         local iconName = tabConfig.IconName or ""
-        local iconType = tabConfig.IconType or "lucide"  -- lucide, solar, craft, geist, sfsymbols, gravity, other
+        local iconType = tabConfig.IconType or "lucide"  
         local iconColor = tabConfig.IconColor or ChronixUI.Themes[ChronixUI.CurrentTheme].IconColor
         
-        -- 计算文字偏移量
+        
         local textPadding = 8 * scale
         local iconOffset = 0
 
@@ -1765,7 +1765,7 @@ function ChronixUI:CreateWindow(config)
         btnCorner.CornerRadius = UDim.new(0, math.floor(4 * scale))
         btnCorner.Parent = tabBtn
 
-        -- 图标 ImageLabel（如果需要）
+        
         local iconLabel = nil
         if hasIcon and iconName ~= "" then
             local iconSize = UDim2.new(0, 18 * scale, 0, 18 * scale)
@@ -1778,12 +1778,12 @@ function ChronixUI:CreateWindow(config)
                 iconLabel.Parent = tabBtn
                 iconOffset = 26 * scale
             else
-                -- 图标还没加载完，先预留位置，等加载完再补上
+                
                 iconOffset = 26 * scale
             end
         end
         
-        -- 文字 Label
+        
         local tabTextLabel = Instance.new("TextLabel")
         tabTextLabel.Name = "TabText"
         tabTextLabel.Size = UDim2.new(1, -textPadding - iconOffset - 8*scale, 1, 0)
@@ -1796,7 +1796,7 @@ function ChronixUI:CreateWindow(config)
         tabTextLabel.Font = Enum.Font.GothamSemibold
         tabTextLabel.Parent = tabBtn
 
-        -- 延迟补加载图标
+        
         if hasIcon and iconName ~= "" and not iconLabel then
             IconModule:WaitForIcon(iconName, iconType, function(iconId)
                 if iconId and tabBtn and tabBtn.Parent then
@@ -1861,7 +1861,7 @@ function ChronixUI:CreateWindow(config)
 
         table.insert(windowData.Tabs, tabData)
 
-        -- UI 元素创建函数 - 所有控件返回包装对象，尺寸已缩放
+        
         local elements = {}
 
         local function wrap(obj)
@@ -1873,12 +1873,12 @@ function ChronixUI:CreateWindow(config)
             local btnText = btnConfig.Text or "按钮"
             local callback = btnConfig.Callback or function() end
 
-            -- === 新增：图标配置 ===
+            
             local hasIcon = btnConfig.HasIcon or true
             local iconName = btnConfig.IconName or "mouse-pointer-click"
             local iconType = btnConfig.IconType or "lucide"
             local iconColor = btnConfig.IconColor or ChronixUI.Themes[ChronixUI.CurrentTheme].IconColor
-            -- =====================
+            
 
             local btn = Instance.new("TextButton")
             btn.Parent = tabContent
@@ -1894,7 +1894,7 @@ function ChronixUI:CreateWindow(config)
             btnCorner.Parent = btn
             AddStroke(btn, ChronixUI.Themes[ChronixUI.CurrentTheme].Border)
 
-            -- === 新增：右侧图标 ===
+            
             if hasIcon and iconName ~= "" then
                 local iconLabel = IconModule:CreateIcon(iconName, UDim2.new(0, 20 * scale, 0, 20 * scale), iconColor, iconType)
                 if iconLabel then
@@ -1902,7 +1902,7 @@ function ChronixUI:CreateWindow(config)
                     iconLabel.Position = UDim2.new(1, -28 * scale, 0.5, -10 * scale)
                     iconLabel.Parent = btn
                 else
-                    -- 异步加载
+                    
                     IconModule:WaitForIcon(iconName, iconType, function(iconId)
                         if iconId and btn and btn.Parent then
                             local newIcon = Instance.new("ImageLabel")
@@ -1918,7 +1918,7 @@ function ChronixUI:CreateWindow(config)
                     end)
                 end
             end
-            -- =====================
+            
 
             btn.MouseButton1Click:Connect(function()
                 PlayClickSound()
@@ -1943,12 +1943,12 @@ function ChronixUI:CreateWindow(config)
             local default = dropdownConfig.Default or options[1]
             local callback = dropdownConfig.Callback or function() end
 
-            -- === 新增：图标配置 ===
+            
             local hasIcon = dropdownConfig.HasIcon or true
             local iconName = dropdownConfig.IconName or "chevron-down"
             local iconType = dropdownConfig.IconType or "lucide"
             local iconColor = dropdownConfig.IconColor or ChronixUI.Themes[ChronixUI.CurrentTheme].IconColor
-            -- =====================
+            
 
             local container = Instance.new("Frame")
             container.Parent = tabContent
@@ -1975,7 +1975,7 @@ function ChronixUI:CreateWindow(config)
             btnCorner.Parent = dropdownBtn
             AddStroke(dropdownBtn, ChronixUI.Themes[ChronixUI.CurrentTheme].Border)
 
-            -- === 新增：右侧图标 ===
+            
             if hasIcon and iconName ~= "" then
                 local iconLabel = IconModule:CreateIcon(iconName, UDim2.new(0, 20 * scale, 0, 20 * scale), iconColor, iconType)
                 if iconLabel then
@@ -1983,7 +1983,7 @@ function ChronixUI:CreateWindow(config)
                     iconLabel.Position = UDim2.new(1, -28 * scale, 0.5, -10 * scale)
                     iconLabel.Parent = dropdownBtn
                 else
-                    -- 异步加载
+                    
                     IconModule:WaitForIcon(iconName, iconType, function(iconId)
                         if iconId and dropdownBtn and dropdownBtn.Parent then
                             local newIcon = Instance.new("ImageLabel")
@@ -1999,7 +1999,7 @@ function ChronixUI:CreateWindow(config)
                     end)
                 end
             end
-            -- =====================
+            
 
             local dropdownList = Instance.new("Frame")
             dropdownList.Parent = container
@@ -2220,12 +2220,12 @@ function ChronixUI:CreateWindow(config)
 
             local isMultiLine = customHeight ~= nil
 
-            -- === 新增：图标配置 ===
+            
             local hasIcon = inputConfig.HasIcon or true
             local iconName = inputConfig.IconName or "text-cursor-input"
             local iconType = inputConfig.IconType or "lucide"
             local iconColor = inputConfig.IconColor or ChronixUI.Themes[ChronixUI.CurrentTheme].IconColor
-            -- =====================
+            
 
             local container = Instance.new("Frame")
             container.Parent = tabContent
@@ -2254,8 +2254,8 @@ function ChronixUI:CreateWindow(config)
             if isMultiLine then
                 inputBox.TextYAlignment = Enum.TextYAlignment.Top
                 inputBox.TextXAlignment = Enum.TextXAlignment.Left
-                inputBox.TextWrapped = true  -- 启用文本自动换行
-                inputBox.MultiLine = true  -- 启用多行输入
+                inputBox.TextWrapped = true  
+                inputBox.MultiLine = true  
             end
 
             local inputCorner = Instance.new("UICorner")
@@ -2263,21 +2263,21 @@ function ChronixUI:CreateWindow(config)
             inputCorner.Parent = inputBox
             AddStroke(inputBox, ChronixUI.Themes[ChronixUI.CurrentTheme].Border)
 
-            -- === 新增：右侧图标 ===
+            
             if hasIcon and iconName ~= "" then
                 local iconLabel = IconModule:CreateIcon(iconName, UDim2.new(0, 20 * scale, 0, 20 * scale), iconColor, iconType)
                 if iconLabel then
                     iconLabel.Name = "InputIcon"
                     if isMultiLine then
-                        -- 多行模式：图标放在右上角
+                        
                         iconLabel.Position = UDim2.new(1, -28 * scale, 0, 8 * scale)
                     else
-                        -- 默认模式：图标垂直居中
+                        
                         iconLabel.Position = UDim2.new(1, -28 * scale, 0.5, -10 * scale)
                     end
                     iconLabel.Parent = inputBox
                 else
-                    -- 异步加载
+                    
                     IconModule:WaitForIcon(iconName, iconType, function(iconId)
                         if iconId and inputBox and inputBox.Parent then
                             local newIcon = Instance.new("ImageLabel")
@@ -2297,7 +2297,7 @@ function ChronixUI:CreateWindow(config)
                     end)
                 end
             end
-            -- =====================
+            
 
             inputBox.FocusLost:Connect(function()
                 callback(inputBox.Text)
@@ -2345,12 +2345,12 @@ function ChronixUI:CreateWindow(config)
             local defaultKey = keybindConfig.Default or "未设置"
             local callback = keybindConfig.Callback or function() end
 
-            -- === 新增：图标配置 ===
+            
             local hasIcon = keybindConfig.HasIcon or true
             local iconName = keybindConfig.IconName or "mouse-pointer-click"
             local iconType = keybindConfig.IconType or "lucide"
             local iconColor = keybindConfig.IconColor or ChronixUI.Themes[ChronixUI.CurrentTheme].IconColor
-            -- =====================
+            
 
             local container = Instance.new("Frame")
             container.Parent = tabContent
@@ -2375,7 +2375,7 @@ function ChronixUI:CreateWindow(config)
             btnCorner.Parent = keyBtn
             AddStroke(keyBtn, ChronixUI.Themes[ChronixUI.CurrentTheme].Border)
 
-            -- === 新增：右侧图标 ===
+            
             if hasIcon and iconName ~= "" then
                 local iconLabel = IconModule:CreateIcon(iconName, UDim2.new(0, 20 * scale, 0, 20 * scale), iconColor, iconType)
                 if iconLabel then
@@ -2383,7 +2383,7 @@ function ChronixUI:CreateWindow(config)
                     iconLabel.Position = UDim2.new(1, -28 * scale, 0.5, -10 * scale)
                     iconLabel.Parent = keyBtn
                 else
-                    -- 异步加载
+                    
                     IconModule:WaitForIcon(iconName, iconType, function(iconId)
                         if iconId and keyBtn and keyBtn.Parent then
                             local newIcon = Instance.new("ImageLabel")
@@ -2399,7 +2399,7 @@ function ChronixUI:CreateWindow(config)
                     end)
                 end
             end
-            -- =====================
+            
 
             local listening = false
             keyBtn.MouseButton1Click:Connect(function()
@@ -2444,7 +2444,7 @@ function ChronixUI:CreateWindow(config)
             local h, s, v = Color3.toHSV(default)
             local expanded = false
             
-            -- 颜色预览条
+            
             local header = Instance.new("Frame")
             header.Size = UDim2.new(1, 0, 0, 38 * scale)
             header.BackgroundTransparency = 1
@@ -2471,7 +2471,7 @@ function ChronixUI:CreateWindow(config)
             expandBtn.Text = ""
             expandBtn.Parent = header
             
-            -- 颜色选择器面板
+            
             local pickerPanel = Instance.new("Frame")
             pickerPanel.Size = UDim2.new(1, 0, 0, 150 * scale)
             pickerPanel.Position = UDim2.new(0, 0, 0, 38 * scale)
@@ -2479,7 +2479,7 @@ function ChronixUI:CreateWindow(config)
             pickerPanel.Visible = false
             pickerPanel.Parent = container
             
-            -- 色盘容器
+            
             local squareContainer = Instance.new("Frame")
             squareContainer.Size = UDim2.new(1, -45 * scale, 1, -10 * scale)
             squareContainer.Position = UDim2.new(0, 5 * scale, 0, 5 * scale)
@@ -2498,7 +2498,7 @@ function ChronixUI:CreateWindow(config)
             satBrightGradient.ScaleType = Enum.ScaleType.Stretch
             satBrightGradient.Parent = squareContainer
             
-            -- 色相条容器
+            
             local hueContainer = Instance.new("Frame")
             hueContainer.Size = UDim2.new(0, 20 * scale, 1, -10 * scale)
             hueContainer.Position = UDim2.new(1, -25 * scale, 0, 5 * scale)
@@ -2534,10 +2534,10 @@ function ChronixUI:CreateWindow(config)
             })
             hueGradient.Parent = hueGradientBar
             
-            -- 选择器圆点 - 关键修复：设置正确的锚点
+            
             local squareSelector = Instance.new("ImageLabel")
             squareSelector.Size = UDim2.new(0, 14 * scale, 0, 14 * scale)
-            squareSelector.AnchorPoint = Vector2.new(0.5, 0.5)  -- 中心锚点
+            squareSelector.AnchorPoint = Vector2.new(0.5, 0.5)  
             squareSelector.BackgroundTransparency = 1
             squareSelector.Image = "rbxassetid://4805639000"
             squareSelector.ZIndex = 10
@@ -2545,13 +2545,13 @@ function ChronixUI:CreateWindow(config)
             
             local hueSelector = Instance.new("ImageLabel")
             hueSelector.Size = UDim2.new(0, 14 * scale, 0, 14 * scale)
-            hueSelector.AnchorPoint = Vector2.new(0.5, 0.5)  -- 中心锚点
+            hueSelector.AnchorPoint = Vector2.new(0.5, 0.5)  
             hueSelector.BackgroundTransparency = 1
             hueSelector.Image = "rbxassetid://4805639000"
             hueSelector.ZIndex = 10
             hueSelector.Parent = hueContainer
             
-            -- 更新颜色显示
+            
             local function updateColor()
                 local color = Color3.fromHSV(h, s, v)
                 colorPreview.BackgroundColor3 = color
@@ -2559,10 +2559,10 @@ function ChronixUI:CreateWindow(config)
                 callback(color)
             end
             
-            -- 更新选择器位置 - 关键修复：简化计算，直接映射鼠标位置
+            
             local function updateSquareSelectorPosition(xPos, yPos)
-                -- 因为锚点是0.5,0.5，位置就是鼠标坐标在容器中的比例位置
-                -- 不需要额外偏移计算
+                
+                
                 local clampedX = math.clamp(xPos, 0, 1)
                 local clampedY = math.clamp(yPos, 0, 1)
                 squareSelector.Position = UDim2.new(clampedX, 0, clampedY, 0)
@@ -2573,7 +2573,7 @@ function ChronixUI:CreateWindow(config)
                 hueSelector.Position = UDim2.new(0.5, 0, clampedY, 0)
             end
             
-            -- 从鼠标位置更新所有值
+            
             local function updateFromSquareMouse(mouseX, mouseY)
                 local xPos = math.clamp((mouseX - satBrightGradient.AbsolutePosition.X) / satBrightGradient.AbsoluteSize.X, 0, 1)
                 local yPos = math.clamp((mouseY - satBrightGradient.AbsolutePosition.Y) / satBrightGradient.AbsoluteSize.Y, 0, 1)
@@ -2590,7 +2590,7 @@ function ChronixUI:CreateWindow(config)
                 updateColor()
             end
             
-            -- 色相条拖动逻辑
+            
             local hueDragging = false
             local hueConnection = nil
             
@@ -2621,7 +2621,7 @@ function ChronixUI:CreateWindow(config)
             hueGradientBar.InputBegan:Connect(startHueDrag)
             hueGradientBar.InputEnded:Connect(endHueDrag)
             
-            -- 色盘拖动逻辑
+            
             local squareDragging = false
             local squareConnection = nil
             
@@ -2652,19 +2652,19 @@ function ChronixUI:CreateWindow(config)
             satBrightGradient.InputBegan:Connect(startSquareDrag)
             satBrightGradient.InputEnded:Connect(endSquareDrag)
             
-            -- 初始化位置
+            
             local function initializePositions()
-                -- 设置色盘选择器位置
+                
                 local initialX = s
                 local initialY = 1 - v
                 squareSelector.Position = UDim2.new(initialX, 0, initialY, 0)
                 
-                -- 设置色相选择器位置
+                
                 local initialHueY = 1 - h
                 hueSelector.Position = UDim2.new(0.5, 0, initialHueY, 0)
             end
             
-            -- 展开/收起
+            
             expandBtn.MouseButton1Click:Connect(function()
                 PlayClickSound()
                 expanded = not expanded
@@ -2680,7 +2680,7 @@ function ChronixUI:CreateWindow(config)
                 end
             end)
             
-            -- 初始化
+            
             task.wait()
             initializePositions()
             updateColor()
@@ -2737,7 +2737,7 @@ function ChronixUI:CreateWindow(config)
         return elements
     end
 
-    -- 创建内置设置 Tab（不在侧边栏显示）
+    
     local settingsElements = windowData:CreateTab({ Name = "设置", IsSettings = true })
     settingsElements:AddTitle("UI 设置")
     settingsElements:AddDivider()
@@ -2778,19 +2778,19 @@ function ChronixUI:CreateWindow(config)
             end
         end
     })
-    -- 背景模糊开关
+    
     settingsElements:AddToggle({
         Label = "背景模糊效果",
         Default = ChronixUI.Settings.BackgroundBlur,
         Callback = function(value)
             ChronixUI.Settings.BackgroundBlur = value
             
-            -- 根据当前菜单状态决定是否应用模糊
+            
             if windowVisible and not windowData.Minimized then
-                -- 菜单显示中：根据新设置更新模糊
+                
                 setBlur(true, false)
             else
-                -- 菜单隐藏中：强制关闭模糊
+                
                 setBlur(false, false)
             end
             
@@ -2802,13 +2802,13 @@ function ChronixUI:CreateWindow(config)
             })
         end
     })
-    -- 隐私模式开关
+    
     settingsElements:AddToggle({
         Label = "隐私模式",
         Default = ChronixUI.Settings.PrivacyMode,
         Callback = function(value)
             ChronixUI.Settings.PrivacyMode = value
-            -- 更新底部信息栏显示
+            
             updatePlayerInfoDisplay()
         
             ChronixUI:Notify({
@@ -2819,12 +2819,12 @@ function ChronixUI:CreateWindow(config)
             })
         end
     })
-    -- 添加主题切换下拉菜单
+    
     local themeNames = {}
     for themeName, _ in pairs(ChronixUI.Themes) do
         table.insert(themeNames, themeName)
     end
-    table.sort(themeNames) -- 按字母排序，看起来整齐
+    table.sort(themeNames) 
     
     settingsElements:AddDropdown({
         Label = "界面主题",
@@ -2848,7 +2848,7 @@ function ChronixUI:CreateWindow(config)
     settingsElements:AddLabel("其他设置")
     windowData.SettingsElements = settingsElements
 
-    -- 添加刷新内容的方法
+    
     function windowData:RefreshContent()
         updateContentCanvas()
     end
@@ -2869,7 +2869,7 @@ function ChronixUI:CreateWindow(config)
                     end
                     windowData.SettingsTabContent.Visible = true
                     windowData.CurrentTab = { Name = "设置" }
-                    -- 强制更新滚动区域尺寸
+                    
                     updateContentCanvas()
                     break
                 end
@@ -2886,7 +2886,7 @@ function ChronixUI:CreateWindow(config)
     return windowData
 end
 
--- 销毁所有窗口
+
 function ChronixUI:Destroy()
     for _, window in pairs(self.Windows) do
         if window.Gui then
@@ -2901,7 +2901,7 @@ function ChronixUI:Destroy()
     end
 end
 
--- 设置主题
+
 function ChronixUI:SetTheme(themeName)
     if not self.Themes[themeName] then
         warn("ChronixUI: 主题 '" .. tostring(themeName) .. "' 不存在")
@@ -2910,7 +2910,7 @@ function ChronixUI:SetTheme(themeName)
     
     self.CurrentTheme = themeName
     
-    -- 遍历所有窗口，调用它们的 UpdateTheme 方法
+    
     for _, window in ipairs(self.Windows) do
         if window.UpdateTheme then
             window:UpdateTheme(themeName)

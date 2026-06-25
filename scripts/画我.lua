@@ -325,25 +325,8 @@ modules["PNGLib\\Modules\\BinaryReader.lua"] = function()
 end
 
 modules["PNGLib\\Modules\\Deflate.lua"] = function()
---[[Lua模块
-在Lua中实现了compress.deflateLua-Deflate(和zlib)。
-描述
-这是解压缩Deflate格式的纯Lua实现。
-包括相关的zlib格式。
-注:此库仅支持解压缩。
-当前未实现压缩。
-参考文献
-[1]压缩数据格式规范1.3版
- http://tools.ietf.org/html/rfc1951 
-[2]GZIP文件格式规范4.3版
- http://tools.ietf.org/html/rfc1952 
-[3]http://en.wikipedia.org/wiki/DEFLATE 
-[4]Pyflate，作者Paul Sladen
- http://www.paul.sladen.org/projects/pyflate/ 
-[5]compress::zlib::perl-部分纯Perl实现
-压缩::zlib
- http://search.cpan.org/~nwclark/compres-zlib-perl/perl.pm
-	]]
+
+
 	local Deflate = {}
 	local band = bit32.band
 	local lshift = bit32.lshift
@@ -2266,9 +2249,8 @@ modules["modules.drawme.canvas"] = function()
 	canvas.get_canvas = function()
 	    local result = nil
 	    
---[[	    if type(getgc) == "function"  then
-	        result = canvas.get_canvas_from_gc()
-	    end]]
+
+
 	    
 	    if not result then
 	        result = canvas.get_canvas_from_instance()
@@ -2307,7 +2289,7 @@ local fileData = selection.Data
 
 local canvasSize = targetImage.Size 
 
---setthreadidentity(8) 
+
 log("Parsing " .. selection.Type .. "...")
 local image = image_loader.load(fileData, selection.Type)
 local srcWidth, srcHeight = image.Width, image.Height

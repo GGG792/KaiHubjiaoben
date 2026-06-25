@@ -434,7 +434,7 @@ local function hexToColor3(hex)
 	local b = tonumber(hex:sub(5, 6), 16) / 255;
 	return Color3.new(r, g, b);
 end
--- 启动次数统计
+
 local launchCount = 0;
 pcall(function()
 	local saved = game:GetService("HttpService"):JSONDecode(readfile("KaiHub_stats.json"));
@@ -445,7 +445,7 @@ local mainWindow = ChronixUI:CreateWindow({Name="KaiHub v6.0",Size=data['basicda
 	unloadChronixHub();
 end});
 
--- 顶部状态栏：启动次数 + 使用时长
+
 local statsBar = Instance.new("Frame");
 statsBar.Size = UDim2.new(1, 0, 0, 20);
 statsBar.BackgroundColor3 = Color3.fromRGB(25, 25, 40);
@@ -485,7 +485,7 @@ rightLabel.TextYAlignment = Enum.TextYAlignment.Center;
 rightLabel.ZIndex = 101;
 rightLabel.Parent = statsBar;
 
--- 计时器
+
 task.spawn(function()
 	while statsBar.Parent do
 		task.wait(1);
@@ -499,7 +499,7 @@ task.spawn(function()
 	end;
 end);
 
--- 把状态栏加到窗口里（延迟等待窗口创建完成）
+
 task.delay(2, function()
 	pcall(function()
 		local gui = LocalPlayer.PlayerGui:FindFirstChild("ChronixUI") or LocalPlayer.PlayerGui:FindFirstChildWhichIsA("ScreenGui");
@@ -514,7 +514,7 @@ task.delay(2, function()
 	end);
 end);
 
--- 玩家加入/退出提示
+
 Players.PlayerAdded:Connect(function(player)
 	pcall(function()
 		ChronixUI:Notify({
@@ -537,13 +537,13 @@ Players.PlayerRemoving:Connect(function(player)
 	end);
 end);
 
--- ========== 从天而降的粑粑表情包 (在UI窗口内部) ==========
+
 local poopContainer = Instance.new("Frame");
 poopContainer.Name = "PoopRainContainer";
 poopContainer.Size = UDim2.new(1, 0, 1, 0);
 poopContainer.BackgroundTransparency = 1;
-poopContainer.ClipsDescendants = true; -- 裁剪到UI窗口范围内
-poopContainer.ZIndex = 0; -- 在UI内容下面，不挡住按钮
+poopContainer.ClipsDescendants = true; 
+poopContainer.ZIndex = 0; 
 
 local poopEmojis = {"💩", "💩", "💩", "🤡"};
 local maxPoops = 6;
@@ -600,7 +600,7 @@ local function createPoop()
 	end)
 end
 
--- 延迟等待UI窗口创建完成后，把粑粑容器放进去
+
 task.delay(2, function()
 	pcall(function()
 		local gui = LocalPlayer.PlayerGui:FindFirstChild("ChronixUI") or LocalPlayer.PlayerGui:FindFirstChildWhichIsA("ScreenGui")
@@ -612,17 +612,17 @@ task.delay(2, function()
 			end
 		end
 	end)
-	-- 开始循环生成
+	
 	while poopContainer and poopContainer.Parent do
 		createPoop()
 		task.wait(math.random(1.5, 3))
 	end
 end)
 
--- ========== UI可拖拽功能 ==========
+
 task.delay(3, function()
 	pcall(function()
-		-- 找到ChronixUI的主窗口Frame
+		
 		local gui = LocalPlayer.PlayerGui:FindFirstChild("ChronixUI") or LocalPlayer.PlayerGui:FindFirstChildWhichIsA("ScreenGui");
 		if not gui then return; end;
 
@@ -636,10 +636,10 @@ task.delay(3, function()
 
 		if not mainFrame then return; end;
 
-		-- 找到标题栏作为拖拽区域
+		
 		local titleBar = mainFrame:FindFirstChildWhichIsA("TextButton") or mainFrame:FindFirstChild("Title");
 		if not titleBar then
-			-- 尝试找第一个子Frame作为标题栏
+			
 			for _, child in ipairs(mainFrame:GetChildren()) do
 				if child:IsA("Frame") and child.Size.Y.Offset < 50 and child.Size.Y.Offset > 15 then
 					titleBar = child;

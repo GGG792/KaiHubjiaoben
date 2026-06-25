@@ -1,5 +1,5 @@
--- FPS 优化器 + UI
--- 提升帧率、降低延迟、优化渲染
+
+
 
 if not game:IsLoaded() then game.Loaded:Wait() end
 
@@ -24,7 +24,7 @@ local function notify(t, txt)
     end)
 end
 
--- ========== FPS 优化功能 ==========
+
 local fpsSettings = {
     fpsCap = 999,
     lowGraphics = false,
@@ -37,7 +37,7 @@ local fpsSettings = {
 
 local originalSettings = {}
 
--- 设置FPS上限
+
 local function setFPSCap(cap)
     if setfpscap then
         setfpscap(cap)
@@ -46,7 +46,7 @@ local function setFPSCap(cap)
     return false
 end
 
--- 低画质模式
+
 local function enableLowGraphics(enable)
     if enable then
         originalSettings.Technology = Lighting.Technology
@@ -82,7 +82,7 @@ local function enableLowGraphics(enable)
     end
 end
 
--- 移除阴影
+
 local function removeShadows(enable)
     if enable then
         for _, v in ipairs(Workspace:GetDescendants()) do
@@ -102,7 +102,7 @@ local function removeShadows(enable)
     end
 end
 
--- 移除粒子效果
+
 local particleConnections = {}
 local function removeParticles(enable)
     if enable then
@@ -113,7 +113,7 @@ local function removeParticles(enable)
             end
         end
         
-        -- 监听新创建的粒子
+        
         table.insert(particleConnections, Workspace.DescendantAdded:Connect(function(desc)
             if desc:IsA("ParticleEmitter") or desc:IsA("Trail") or desc:IsA("Smoke") or desc:IsA("Fire") or desc:IsA("Sparkles") then
                 originalSettings[desc] = desc.Enabled
@@ -134,7 +134,7 @@ local function removeParticles(enable)
     end
 end
 
--- 简化纹理
+
 local function simplifyTextures(enable)
     if enable then
         for _, v in ipairs(Workspace:GetDescendants()) do
@@ -163,7 +163,7 @@ local function simplifyTextures(enable)
     end
 end
 
--- 渲染距离优化
+
 local renderConn = nil
 local function setRenderDistance(dist)
     if renderConn then
@@ -191,7 +191,7 @@ local function setRenderDistance(dist)
     end)
 end
 
--- 反卡顿
+
 local antiLagConn = nil
 local function enableAntiLag(enable)
     if enable then
@@ -210,13 +210,13 @@ local function enableAntiLag(enable)
     end
 end
 
--- ========== UI 创建 ==========
+
 local gui = Instance.new("ScreenGui")
 gui.Name = "FPSBooster"
 gui.ResetOnSpawn = false
 gui.Parent = LP:WaitForChild("PlayerGui")
 
--- 主框架
+
 local mainFrame = Instance.new("Frame")
 mainFrame.Size = UDim2.new(0, 280, 0, 420)
 mainFrame.Position = UDim2.new(0.5, -140, 0.5, -210)
@@ -230,7 +230,7 @@ local frameStroke = Instance.new("UIStroke", mainFrame)
 frameStroke.Color = Color3.fromRGB(0, 180, 120)
 frameStroke.Thickness = 2
 
--- 标题栏
+
 local titleBar = Instance.new("TextButton")
 titleBar.Size = UDim2.new(1, 0, 0, 32)
 titleBar.BackgroundColor3 = Color3.fromRGB(30, 30, 45)
@@ -245,7 +245,7 @@ titleBar.Active = true
 titleBar.Parent = mainFrame
 Instance.new("UICorner", titleBar).CornerRadius = UDim.new(0, 10)
 
--- 关闭按钮
+
 local closeBtn = Instance.new("TextButton")
 closeBtn.Size = UDim2.new(0, 26, 0, 26)
 closeBtn.Position = UDim2.new(1, -28, 0, 3)
@@ -269,7 +269,7 @@ closeBtn.MouseButton1Click:Connect(function()
     _G.FPSBoosterLoaded = false
 end)
 
--- FPS 显示
+
 local fpsLabel = Instance.new("TextLabel")
 fpsLabel.Size = UDim2.new(1, -16, 0, 24)
 fpsLabel.Position = UDim2.new(0, 8, 0, 36)
@@ -280,7 +280,7 @@ fpsLabel.TextSize = 16
 fpsLabel.TextColor3 = Color3.fromRGB(0, 220, 150)
 fpsLabel.Parent = mainFrame
 
--- 实时FPS计算
+
 local fps = 0
 local lastTick = tick()
 RunService.RenderStepped:Connect(function()
@@ -292,7 +292,7 @@ RunService.RenderStepped:Connect(function()
     end
 end)
 
--- 内容区
+
 local content = Instance.new("ScrollingFrame")
 content.Size = UDim2.new(1, -16, 1, -68)
 content.Position = UDim2.new(0, 8, 0, 62)
@@ -308,7 +308,7 @@ layout.SortOrder = Enum.SortOrder.LayoutOrder
 layout.Padding = UDim.new(0, 6)
 layout.Parent = content
 
--- 创建开关函数
+
 local function createToggle(text, default, callback)
     local frame = Instance.new("Frame")
     frame.Size = UDim2.new(1, 0, 0, 36)
@@ -362,7 +362,7 @@ local function createToggle(text, default, callback)
     return frame
 end
 
--- 创建滑块
+
 local function createSlider(text, min, max, default, callback)
     local frame = Instance.new("Frame")
     frame.Size = UDim2.new(1, 0, 0, 50)
@@ -437,7 +437,7 @@ local function createSlider(text, min, max, default, callback)
     return frame
 end
 
--- 创建按钮
+
 local function createButton(text, callback)
     local btn = Instance.new("TextButton")
     btn.Size = UDim2.new(1, 0, 0, 36)
@@ -462,7 +462,7 @@ local function createButton(text, callback)
     return btn
 end
 
--- 添加控件
+
 createToggle("解锁FPS上限", false, function(val)
     if val then
         if setFPSCap(999) then
@@ -507,7 +507,7 @@ createToggle("反卡顿清理", false, function(val)
 end)
 
 createButton("一键优化", function()
-    -- 开启所有优化
+    
     setFPSCap(999)
     enableLowGraphics(true)
     removeShadows(true)
@@ -532,7 +532,7 @@ createButton("恢复默认", function()
     notify("FPS优化器", "所有设置已恢复默认")
 end)
 
--- 拖拽功能
+
 local dragging = false
 local dragStart, startPos
 

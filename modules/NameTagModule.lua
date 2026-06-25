@@ -1,8 +1,8 @@
--- ================================================
--- 文件名：NameTagModule.lua
--- 放置位置：ReplicatedStorage（客户端 require 使用）
--- 支持匹配模式: "only", "fuzzy", "path", "pathFuzzy"
--- ================================================
+
+
+
+
+
 
 local cloneref = cloneref or clonereference or function(obj) return obj end
 local Players = cloneref(game:GetService("Players"))
@@ -14,9 +14,9 @@ local instances = {}
 
 local LocalPlayer = Players.LocalPlayer
 
--- -------------------------------------------------
--- 内部工具函数：构建对象的完整路径
--- -------------------------------------------------
+
+
+
 local function getFullPath(obj)
 	local parts = {}
 	local current = obj
@@ -27,9 +27,9 @@ local function getFullPath(obj)
 	return table.concat(parts, ".")
 end
 
--- -------------------------------------------------
--- 内部工具函数：路径绝对匹配 - 找到指定路径的对象
--- -------------------------------------------------
+
+
+
 local function findObjectByAbsolutePath(pathStr)
 	local parts = {}
 	for part in string.gmatch(pathStr, "[^%.]+") do
@@ -47,9 +47,9 @@ local function findObjectByAbsolutePath(pathStr)
 	return current
 end
 
--- -------------------------------------------------
--- 内部工具函数：路径模糊匹配 - 在路径中查找匹配层级
--- -------------------------------------------------
+
+
+
 local function findDeepestMatchLevel(pathStr, patterns)
 	local pathParts = {}
 	for part in string.gmatch(pathStr, "[^%.]+") do
@@ -97,9 +97,9 @@ local function findDeepestMatchLevel(pathStr, patterns)
 	return maxLevel
 end
 
--- -------------------------------------------------
--- 创建 NameTag 实例
--- -------------------------------------------------
+
+
+
 local function createNameTagInstance(modelName, matchMode, fontSize, showDistance, customText)
 	local self = {}
 
@@ -111,28 +111,28 @@ local function createNameTagInstance(modelName, matchMode, fontSize, showDistanc
 
 	self.enabled = false
 	self.connections = {}
-	self.activeTags = {}           -- { [model] = {billboard, label} }
-	self.modelToTag = {}           -- Model -> true（防重复）
+	self.activeTags = {}           
+	self.modelToTag = {}           
 	self.scanConnection = nil
 	self.descendantConnection = nil
-	self.modelConns = {}           -- 模型内部的 DescendantAdded 连接
+	self.modelConns = {}           
 	self.currentApplyTaskId = nil
 	self.isApplying = false
 
-	-- 任务ID生成器
+	
 	local taskCounter = 0
 	local function getNewTaskId()
 		taskCounter = taskCounter + 1
 		return taskCounter
 	end
 
-	-- 内部：为模型添加标签
+	
 	local function addTagToModel(model)
 		if not model:IsA("Model") then return end
 		if self.modelToTag[model] then return end
 		if Players:GetPlayerFromCharacter(model) then return end
 
-		-- 找任意 BasePart 作为 Adornee（递归找）
+		
 		local adornee = nil
 		for _, child in ipairs(model:GetDescendants()) do
 			if child:IsA("BasePart") then
@@ -141,7 +141,7 @@ local function createNameTagInstance(modelName, matchMode, fontSize, showDistanc
 			end
 		end
 
-		-- 创建 BillboardGui
+		
 		local billboard = Instance.new("BillboardGui")
 		billboard.Name = "NameTag_" .. model.Name
 		billboard.Size = UDim2.new(0, 200, 0, 50)
@@ -153,7 +153,7 @@ local function createNameTagInstance(modelName, matchMode, fontSize, showDistanc
 			billboard.Adornee = adornee
 		end
 
-		-- 创建 TextLabel
+		
 		local label = Instance.new("TextLabel")
 		label.Size = UDim2.new(1, 0, 1, 0)
 		label.BackgroundTransparency = 1
@@ -175,11 +175,11 @@ local function createNameTagInstance(modelName, matchMode, fontSize, showDistanc
 			label.TextScaled = true
 		end
 
-		-- 记录
+		
 		self.activeTags[model] = { billboard = billboard, label = label }
 		self.modelToTag[model] = true
 
-		-- 如果没有 adornee，监听模型内部新增部件，等部件出现时补上
+		
 		if not adornee then
 			local childConn = model.DescendantAdded:Connect(function(child)
 				if child:IsA("BasePart") and not billboard.Adornee then
@@ -191,7 +191,7 @@ local function createNameTagInstance(modelName, matchMode, fontSize, showDistanc
 		end
 	end
 
-	-- 内部：移除模型上的标签
+	
 	local function removeTagFromModel(model)
 		local tagData = self.activeTags[model]
 		if not tagData then return end
@@ -203,14 +203,14 @@ local function createNameTagInstance(modelName, matchMode, fontSize, showDistanc
 		self.modelToTag[model] = nil
 	end
 
-	-- 内部：移除所有标签
+	
 	local function removeAllTags()
 		for model, _ in pairs(self.activeTags) do
 			removeTagFromModel(model)
 		end
 	end
 
-	-- 内部：检查对象是否匹配（跟高亮模块一致）
+	
 	local function isMatch(obj)
 		if self.matchMode == "only" then
 			return obj.Name == self.modelName
@@ -224,7 +224,7 @@ local function createNameTagInstance(modelName, matchMode, fontSize, showDistanc
 		return false
 	end
 
-	-- 内部：检查对象是否是目标路径对象的后代（path/pathFuzzy 扫描时用）
+	
 	local function isDescendantOfTarget(obj, targetObj)
 		local current = obj
 		while current do
@@ -236,7 +236,7 @@ local function createNameTagInstance(modelName, matchMode, fontSize, showDistanc
 		return false
 	end
 
-	-- 内部：异步扫描核心（分帧处理）
+	
 	local function asyncScanCore(taskId)
 		if self.scanConnection then
 			self.scanConnection:Disconnect()
@@ -289,7 +289,7 @@ local function createNameTagInstance(modelName, matchMode, fontSize, showDistanc
 		end)
 	end
 
-	-- 公共方法：启用
+	
 	self.enable = function()
 		if self.enabled then return end
 		self.enabled = true
@@ -312,7 +312,7 @@ local function createNameTagInstance(modelName, matchMode, fontSize, showDistanc
 		self.isApplying = true
 		asyncScanCore(self.currentApplyTaskId)
 
-		-- 监听新加入的对象
+		
 		self.descendantConnection = Workspace.DescendantAdded:Connect(function(descendant)
 			if not self.enabled then return end
 
@@ -347,7 +347,7 @@ local function createNameTagInstance(modelName, matchMode, fontSize, showDistanc
 					table.insert(self.modelConns, childConn)
 				end
 			else
-				-- only/fuzzy 模式
+				
 				local current = descendant
 				while current do
 					if current:IsA("Model") and isMatch(current) then
@@ -365,7 +365,7 @@ local function createNameTagInstance(modelName, matchMode, fontSize, showDistanc
 			end
 		end)
 
-		-- 距离更新
+		
 		if self.showDistance then
 			local heartbeatConn = RunService.Heartbeat:Connect(function()
 				self:_updateDistances()
@@ -374,7 +374,7 @@ local function createNameTagInstance(modelName, matchMode, fontSize, showDistanc
 		end
 	end
 
-	-- 公共方法：禁用
+	
 	self.disable = function()
 		if not self.enabled then return end
 		self.enabled = false
@@ -405,7 +405,7 @@ local function createNameTagInstance(modelName, matchMode, fontSize, showDistanc
 		removeAllTags()
 	end
 
-	-- 公共方法：销毁
+	
 	self.destroy = function()
 		self:disable()
 
@@ -419,7 +419,7 @@ local function createNameTagInstance(modelName, matchMode, fontSize, showDistanc
 		setmetatable(self, nil)
 	end
 
-	-- 内部方法：更新距离显示
+	
 	self._updateDistances = function()
 		if not self.enabled or not self.showDistance then return end
 
@@ -446,10 +446,10 @@ local function createNameTagInstance(modelName, matchMode, fontSize, showDistanc
 	return self
 end
 
--- 对外接口
+
 NameTagModule.new = createNameTagInstance
 
--- 全局卸载所有实例
+
 NameTagModule.unload = function()
 	for i = #instances, 1, -1 do
 		local inst = instances[i]

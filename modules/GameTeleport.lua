@@ -1,4 +1,4 @@
--- TeleportModule (ModuleScript)
+
 local cloneref = cloneref or clonereference or function(obj) return obj end
 local TeleportService = cloneref(game:GetService("TeleportService"))
 local Players = cloneref(game:GetService("Players"))
@@ -6,11 +6,11 @@ local HttpService = cloneref(game:GetService("HttpService"))
 
 local Teleport = {}
 
--- 私有函数：根据游戏 ID（universeId）获取根场景 ID（rootPlaceId）
+
 local function getRootPlaceIdFromUniverseId(universeId)
     local url = "https://games.roblox.com/v1/games?universeIds=" .. universeId
     local success, response = pcall(function()
-        return game:HttpGet(url)  -- 使用 game:HttpGet 确保兼容性
+        return game:HttpGet(url)  
     end)
 
     if not success then
@@ -30,7 +30,7 @@ local function getRootPlaceIdFromUniverseId(universeId)
     return nil
 end
 
--- 唯一公开函数：传入游戏 ID（universeId），传送当前玩家
+
 function Teleport.teleportByGameId(universeId)
     local rootPlaceId = getRootPlaceIdFromUniverseId(universeId)
     if not rootPlaceId then

@@ -1,4 +1,4 @@
--- 修正后的模块代码
+
 local LockCameraModule = {}
 
 local cloneref = cloneref or clonereference or function(obj) return obj end
@@ -12,7 +12,7 @@ local camera = Workspace.CurrentCamera
 local isEnabled = false
 local isLocking = false
 local bindKey = Enum.KeyCode.Tab
-local actionName = "LockCameraAction"  -- ContextAction 的唯一名称
+local actionName = "LockCameraAction"  
 
 local lockedCameraCFrame = nil
 local lockedCharacterHRP = nil
@@ -33,7 +33,7 @@ local function updateCamera()
     camera.CFrame = newCFrame
 end
 
--- ContextAction 的处理函数
+
 local function onAction(actionName, inputState, inputObject)
     if not isEnabled then return Enum.ContextActionResult.Pass end
 
@@ -48,7 +48,7 @@ local function onAction(actionName, inputState, inputObject)
                 renderStepConn = RunService:BindToRenderStep("CameraLock", Enum.RenderPriority.Camera.Value + 1, updateCamera)
             end
         end
-        return Enum.ContextActionResult.Sink  -- 吞掉事件，阻止默认行为
+        return Enum.ContextActionResult.Sink  
     elseif inputState == Enum.UserInputState.End then
         isLocking = false
         lockedCharacterHRP = nil
@@ -68,8 +68,8 @@ local function setupBind()
         ContextActionService:BindActionAtPriority(
             actionName,
             onAction,
-            false,  -- 不创建按钮
-            Enum.ContextActionPriority.High.Value,  -- 高优先级，确保拦截
+            false,  
+            Enum.ContextActionPriority.High.Value,  
             bindKey
         )
     else

@@ -1,9 +1,9 @@
--- 恐脚本 - 恐怖风格启动器
--- 作者: KaiHub
+
+
 
 if not game:IsLoaded() then game.Loaded:Wait() end
 
--- 防止重复加载
+
 if _G.KongJuBenLoaded then return end
 _G.KongJuBenLoaded = true
 
@@ -13,22 +13,22 @@ local TweenService = game:GetService("TweenService")
 local RunService = game:GetService("RunService")
 local UserInputService = game:GetService("UserInputService")
 
--- ========== 创建恐脚本启动界面 ==========
+
 local gui = Instance.new("ScreenGui")
 gui.Name = "KongJuBen"
 gui.ResetOnSpawn = false
 gui.DisplayOrder = 9999
 gui.Parent = LP:WaitForChild("PlayerGui")
 
--- 红色背景
+
 local bg = Instance.new("Frame")
 bg.Name = "Background"
 bg.Size = UDim2.new(1, 0, 1, 0)
-bg.BackgroundColor3 = Color3.fromRGB(139, 0, 0) -- 深红色
+bg.BackgroundColor3 = Color3.fromRGB(139, 0, 0) 
 bg.BorderSizePixel = 0
 bg.Parent = gui
 
--- 渐变效果
+
 local gradient = Instance.new("UIGradient")
 gradient.Color = ColorSequence.new({
     ColorSequenceKeypoint.new(0, Color3.fromRGB(80, 0, 0)),
@@ -38,7 +38,7 @@ gradient.Color = ColorSequence.new({
 gradient.Rotation = 45
 gradient.Parent = bg
 
--- 恐脚本大字
+
 local title = Instance.new("TextLabel")
 title.Name = "Title"
 title.Size = UDim2.new(0, 600, 0, 150)
@@ -52,7 +52,7 @@ title.TextStrokeTransparency = 0.3
 title.TextStrokeColor3 = Color3.fromRGB(50, 0, 0)
 title.Parent = bg
 
--- 副标题
+
 local subtitle = Instance.new("TextLabel")
 subtitle.Name = "Subtitle"
 subtitle.Size = UDim2.new(0, 400, 0, 40)
@@ -65,7 +65,7 @@ subtitle.TextColor3 = Color3.fromRGB(200, 50, 50)
 subtitle.TextTransparency = 0.3
 subtitle.Parent = bg
 
--- 启动按钮
+
 local startBtn = Instance.new("TextButton")
 startBtn.Name = "StartButton"
 startBtn.Size = UDim2.new(0, 250, 0, 60)
@@ -80,18 +80,18 @@ startBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
 startBtn.AutoButtonColor = false
 startBtn.Parent = bg
 
--- 按钮圆角
+
 local btnCorner = Instance.new("UICorner")
 btnCorner.CornerRadius = UDim.new(0, 8)
 btnCorner.Parent = startBtn
 
--- 按钮发光效果
+
 local btnStroke = Instance.new("UIStroke")
 btnStroke.Color = Color3.fromRGB(255, 50, 50)
 btnStroke.Thickness = 2
 btnStroke.Parent = startBtn
 
--- 按钮悬停效果
+
 startBtn.MouseEnter:Connect(function()
     TweenService:Create(startBtn, TweenInfo.new(0.2), {BackgroundColor3 = Color3.fromRGB(220, 20, 20)}):Play()
     TweenService:Create(btnStroke, TweenInfo.new(0.2), {Color = Color3.fromRGB(255, 100, 100)}):Play()
@@ -102,7 +102,7 @@ startBtn.MouseLeave:Connect(function()
     TweenService:Create(btnStroke, TweenInfo.new(0.2), {Color = Color3.fromRGB(255, 50, 50)}):Play()
 end)
 
--- ========== 恐脚本飘落效果 ==========
+
 local fallingTexts = {}
 local maxFalling = 15
 
@@ -157,7 +157,7 @@ local function createFallingText()
     end)
 end
 
--- 循环生成飘落文字
+
 task.spawn(function()
     while bg and bg.Parent do
         createFallingText()
@@ -165,14 +165,14 @@ task.spawn(function()
     end
 end)
 
--- ========== 启动按钮点击 ==========
+
 startBtn.MouseButton1Click:Connect(function()
-    -- 按钮点击动画
+    
     TweenService:Create(startBtn, TweenInfo.new(0.1), {Size = UDim2.new(0, 240, 0, 55)}):Play()
     task.wait(0.1)
     TweenService:Create(startBtn, TweenInfo.new(0.1), {Size = UDim2.new(0, 250, 0, 60)}):Play()
 
-    -- 淡出启动界面
+    
     TweenService:Create(bg, TweenInfo.new(1), {BackgroundTransparency = 1}):Play()
     for _, child in ipairs(bg:GetDescendants()) do
         if child:IsA("TextLabel") or child:IsA("TextButton") then
@@ -185,14 +185,14 @@ startBtn.MouseButton1Click:Connect(function()
 
     task.wait(1)
 
-    -- 删除启动界面
+    
     bg:Destroy()
 
-    -- 创建悬浮窗
+    
     createFloatingWindow()
 end)
 
--- ========== 悬浮窗功能 ==========
+
 function createFloatingWindow()
     local floatGui = Instance.new("ScreenGui")
     floatGui.Name = "KongJuBenFloat"
@@ -200,7 +200,7 @@ function createFloatingWindow()
     floatGui.DisplayOrder = 10000
     floatGui.Parent = LP:WaitForChild("PlayerGui")
 
-    -- 主窗口
+    
     local mainFrame = Instance.new("Frame")
     mainFrame.Name = "MainFrame"
     mainFrame.Size = UDim2.new(0, 300, 0, 400)
@@ -210,18 +210,18 @@ function createFloatingWindow()
     mainFrame.Active = true
     mainFrame.Parent = floatGui
 
-    -- 圆角
+    
     local corner = Instance.new("UICorner")
     corner.CornerRadius = UDim.new(0, 12)
     corner.Parent = mainFrame
 
-    -- 边框
+    
     local stroke = Instance.new("UIStroke")
     stroke.Color = Color3.fromRGB(180, 0, 0)
     stroke.Thickness = 2
     stroke.Parent = mainFrame
 
-    -- 标题栏
+    
     local titleBar = Instance.new("Frame")
     titleBar.Name = "TitleBar"
     titleBar.Size = UDim2.new(1, 0, 0, 40)
@@ -233,7 +233,7 @@ function createFloatingWindow()
     titleCorner.CornerRadius = UDim.new(0, 12)
     titleCorner.Parent = titleBar
 
-    -- 标题文字
+    
     local titleText = Instance.new("TextLabel")
     titleText.Size = UDim2.new(1, -80, 1, 0)
     titleText.Position = UDim2.new(0, 10, 0, 0)
@@ -245,7 +245,7 @@ function createFloatingWindow()
     titleText.TextXAlignment = Enum.TextXAlignment.Left
     titleText.Parent = titleBar
 
-    -- 关闭按钮
+    
     local closeBtn = Instance.new("TextButton")
     closeBtn.Size = UDim2.new(0, 30, 0, 30)
     closeBtn.Position = UDim2.new(1, -35, 0, 5)
@@ -267,7 +267,7 @@ function createFloatingWindow()
         _G.KongJuBenLoaded = false
     end)
 
-    -- 内容区
+    
     local content = Instance.new("ScrollingFrame")
     content.Name = "Content"
     content.Size = UDim2.new(1, -20, 1, -60)
@@ -284,7 +284,7 @@ function createFloatingWindow()
     layout.Padding = UDim.new(0, 8)
     layout.Parent = content
 
-    -- 功能按钮
+    
     local function addButton(text, callback)
         local btn = Instance.new("TextButton")
         btn.Size = UDim2.new(1, 0, 0, 40)
@@ -313,7 +313,7 @@ function createFloatingWindow()
         return btn
     end
 
-    -- 添加功能按钮
+    
     addButton("加载 KaiHub", function()
         loadstring(game:HttpGet("https://raw.githubusercontent.com/GGG792/KaiHubjiaoben/refs/heads/main/Ui.lua"))()
     end)
@@ -339,7 +339,7 @@ function createFloatingWindow()
         _G.KongJuBenLoaded = false
     end)
 
-    -- 拖拽功能
+    
     local dragging = false
     local dragStart, startPos
 
@@ -367,12 +367,12 @@ function createFloatingWindow()
         end
     end)
 
-    -- 阻止桌面滑动（通过拦截输入）
+    
     local blockConn = UserInputService.TouchPan:Connect(function()
         return nil
     end)
 
-    -- 悬浮窗关闭时解除拦截
+    
     floatGui.Destroying:Connect(function()
         if blockConn then blockConn:Disconnect() end
     end)

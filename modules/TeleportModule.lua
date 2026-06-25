@@ -1,7 +1,7 @@
--- 模块脚本，建议放在 ReplicatedStorage 或 StarterPlayerScripts 中
+
 local teleportModule = {}
 
--- 内部变量
+
 local cloneref = cloneref or clonereference or function(obj) return obj end
 local userInputService = cloneref(game:GetService("UserInputService"))
 local players = cloneref(game:GetService("Players"))
@@ -13,7 +13,7 @@ local inputBeganConn = nil
 local inputEndedConn = nil
 local mouseButton1Conn = nil
 
--- 清理所有连接
+
 local function cleanConnections()
 	if inputBeganConn then
 		inputBeganConn:Disconnect()
@@ -29,14 +29,14 @@ local function cleanConnections()
 	end
 end
 
--- 开启功能
+
 function teleportModule.enable()
-	-- 如果已开启则先关闭
+	
 	if mouseButton1Conn then
 		teleportModule.disable()
 	end
 
-	-- 检测 Ctrl 按下
+	
 	inputBeganConn = userInputService.InputBegan:Connect(function(input, gameProcessed)
 		if gameProcessed then return end
 		if input.KeyCode == Enum.KeyCode.LeftControl or input.KeyCode == Enum.KeyCode.RightControl then
@@ -44,7 +44,7 @@ function teleportModule.enable()
 		end
 	end)
 
-	-- 检测 Ctrl 松开
+	
 	inputEndedConn = userInputService.InputEnded:Connect(function(input, gameProcessed)
 		if gameProcessed then return end
 		if input.KeyCode == Enum.KeyCode.LeftControl or input.KeyCode == Enum.KeyCode.RightControl then
@@ -52,7 +52,7 @@ function teleportModule.enable()
 		end
 	end)
 
-	-- 检测鼠标点击
+	
 	mouseButton1Conn = mouse.Button1Down:Connect(function()
 		if not ctrlHeld then return end
 		
@@ -70,16 +70,16 @@ function teleportModule.enable()
 	end)
 end
 
--- 关闭功能
+
 function teleportModule.disable()
 	ctrlHeld = false
 	cleanConnections()
 end
 
--- 卸载模块
+
 function teleportModule.unload()
 	teleportModule.disable()
-	-- 清空模块方法
+	
 	for k in pairs(teleportModule) do
 		teleportModule[k] = nil
 	end

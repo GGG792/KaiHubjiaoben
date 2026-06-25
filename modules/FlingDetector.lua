@@ -1,4 +1,4 @@
--- AntiFling.lua
+
 local cloneref = cloneref or clonereference or function(obj) return obj end
 local Players = cloneref(game:GetService("Players"))
 
@@ -7,7 +7,7 @@ local connections = {}
 local isEnabled = false
 local speaker
 
--- 处理单个角色
+
 local function setupCharacter(character)
 	if not character then return end
 
@@ -25,7 +25,7 @@ local function setupCharacter(character)
 	table.insert(connections, conn)
 end
 
--- 处理新玩家加入
+
 local function onPlayerAdded(player)
 	if not isEnabled or player == speaker then return end
 
@@ -40,7 +40,7 @@ local function onPlayerAdded(player)
 	end
 end
 
--- 恢复所有碰撞
+
 local function restoreAllCollisions()
 	for _, player in pairs(Players:GetPlayers()) do
 		if player ~= speaker and player.Character then

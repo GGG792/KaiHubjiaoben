@@ -206,7 +206,7 @@ end
 
 local function onInputBegan(input, gameProcessed)
 	if gameProcessed then return end
-	-- 每次按键时动态读取最新的 bindKey 值
+	
 	if input.KeyCode == bindKey and UserInputService:IsKeyDown(Enum.KeyCode.LeftControl) then
 		togglefly()
 		return Enum.ContextActionResult.Sink
@@ -215,12 +215,12 @@ end
 
 function module.enable()
 	if isMobile then
-		-- 手机端：直接开启飞行
+		
 		if not enable then
 			togglefly()
 		end
 	else
-		-- 电脑端：只启动快捷键监听，不自动开启飞行
+		
 		if connection then
 			connection:Disconnect()
 		end
@@ -230,12 +230,12 @@ end
 
 function module.disable()
 	if isMobile then
-		-- 手机端：直接关闭飞行
+		
 		if enable then
 			togglefly()
 		end
 	else
-		-- 电脑端：关闭快捷键监听，并关闭飞行
+		
 		if enable then
 			togglefly()
 		end

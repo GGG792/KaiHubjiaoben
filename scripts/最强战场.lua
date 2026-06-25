@@ -403,7 +403,7 @@ combatSection:Toggle({Title="自动打人",Value=false,Callback=function(Value)
 		autoFarmThread = nil;
 	end
 end});
--- 玩家选择列表 (使用按钮方式，兼容所有UI库)
+
 local playerSelectButtons = {};
 local selectedPlayerLabel = nil;
 
@@ -447,13 +447,13 @@ local function refreshPlayerList()
 	end;
 end;
 
--- 显示当前选择的目标
+
 selectedPlayerLabel = combatSection:Label({Title="当前目标: 无 (随机选择)"});
 
--- 初始刷新
+
 refreshPlayerList();
 
--- 玩家加入/离开时刷新列表
+
 game:GetService("Players").PlayerAdded:Connect(function()
 	task.wait(0.5);
 	refreshPlayerList();

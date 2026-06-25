@@ -1,5 +1,5 @@
--- WebSocketManager.lua
--- 用于 Potassium 注入器环境，WebSocket 全局可用
+
+
 
 local WebSocketManager = {}
 WebSocketManager.__index = WebSocketManager
@@ -24,14 +24,14 @@ function WebSocketManager.new()
     self.OnSystemMessage = Instance.new("BindableEvent")
     self.OnUserListUpdate = Instance.new("BindableEvent")
     self.OnConnectionChanged = Instance.new("BindableEvent")
-    self.OnUserOnline = Instance.new("BindableEvent")   -- 新增
-    self.OnUserOffline = Instance.new("BindableEvent")  -- 新增
+    self.OnUserOnline = Instance.new("BindableEvent")   
+    self.OnUserOffline = Instance.new("BindableEvent")  
 
     return self
 end
 
 function WebSocketManager:Connect()
-    -- 取消之前的重连
+    
     self._shouldReconnect = false
     if self._connectThread then
         task.cancel(self._connectThread)
@@ -43,7 +43,7 @@ function WebSocketManager:Connect()
         self.ws = nil
     end
 
-    -- ✅ 异步连接，不阻塞主线程
+    
     self._shouldReconnect = true
     self._reconnectAttempts = 0
     self:_tryConnect()
@@ -59,14 +59,14 @@ function WebSocketManager:_tryConnect()
 
     self._reconnectAttempts = self._reconnectAttempts + 1
     
-    -- ✅ 使用 task.spawn 异步执行连接
+    
     self._connectThread = task.spawn(function()
         local encodedUsername = HttpService:UrlEncode(self.username)
         local url = SERVER_URL .. "?userId=" .. tostring(self.userId) .. "&username=" .. encodedUsername
 
         print("[WebSocketManager] 正在连接 (尝试 " .. self._reconnectAttempts .. "/" .. self._maxReconnectAttempts .. ")")
 
-        -- 连接（这里可能会阻塞，但在 task.spawn 中不影响主线程）
+        
         local ws = WebSocket.connect(url)
 
         if not ws then
@@ -79,12 +79,12 @@ function WebSocketManager:_tryConnect()
             return
         end
 
-        -- 连接成功
+        
         self.ws = ws
         self._reconnectAttempts = 0
         print("[WebSocketManager] ✅ 对象创建成功，绑定事件")
 
-        -- 绑定事件
+        
         self:_bindEvents()
 
         self.isConnected = true
@@ -98,7 +98,7 @@ function WebSocketManager:_bindEvents()
 
     if self.ws.OnMessage then
         self.ws.OnMessage:Connect(function(message)
-            -- ✅ 在任务调度器中处理消息，避免阻塞
+            
             task.spawn(function()
                 self:_handleMessage(message)
             end)
@@ -118,7 +118,7 @@ function WebSocketManager:SendChatMessage(content)
         return
     end
 
-    -- ✅ 异步发送，避免阻塞
+    
     task.spawn(function()
         local msg = {
             type = "chat",
@@ -186,12 +186,12 @@ function WebSocketManager:_handleMessage(data)
         self.OnSystemMessage:Fire(msg.content)
     elseif msg.type == "userList" then
         self.OnUserListUpdate:Fire(msg.users)
-    elseif msg.type == "userOnline" then  -- ✅ 检测到别人上线
+    elseif msg.type == "userOnline" then  
         self.OnUserOnline:Fire({
             userId = msg.userId,
             username = msg.username
         })
-    elseif msg.type == "userOffline" then  -- ✅ 检测到别人下线
+    elseif msg.type == "userOffline" then  
         self.OnUserOffline:Fire({
             userId = msg.userId,
             username = msg.username

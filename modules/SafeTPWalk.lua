@@ -1,7 +1,7 @@
--- TPWalk 模块
+
 local TPWalk = {}
 
--- 私有变量
+
 local cloneref = cloneref or clonereference or function(obj) return obj end
 local RunService = cloneref(game:GetService("RunService"))
 local Players = cloneref(game:GetService("Players"))
@@ -11,7 +11,7 @@ local _speed = 1
 local _connection = nil
 local _player = Players.LocalPlayer
 
--- 内部更新函数
+
 local function update(delta)
     if not _enabled then return end
     
@@ -28,13 +28,13 @@ local function update(delta)
     end
 end
 
--- 内部启动连接
+
 local function start()
     if _connection then return end
     _connection = RunService.Heartbeat:Connect(update)
 end
 
--- 内部停止连接
+
 local function stop()
     if _connection then
         _connection:Disconnect()
@@ -42,7 +42,7 @@ local function stop()
     end
 end
 
--- 公开方法
+
 function TPWalk:Enabled(state)
     if state == nil then
         return _enabled
