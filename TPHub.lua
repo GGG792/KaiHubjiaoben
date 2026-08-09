@@ -126,46 +126,60 @@ gui.Parent = LP:WaitForChild("PlayerGui")
 
 -- 主窗口
 local mainFrame = Instance.new("Frame")
-mainFrame.Size = UDim2.new(0, 300, 0, 420)
-mainFrame.Position = UDim2.new(0.5, -150, 0.5, -210)
+mainFrame.Size = UDim2.new(0, 230, 0, 320)
+mainFrame.Position = UDim2.new(0.5, -115, 0.5, -160)
 mainFrame.BackgroundColor3 = Color3.fromRGB(25, 25, 35)
 mainFrame.BorderSizePixel = 0
 mainFrame.Active = true
 mainFrame.Parent = gui
 
-Instance.new("UICorner", mainFrame).CornerRadius = UDim.new(0, 10)
+Instance.new("UICorner", mainFrame).CornerRadius = UDim.new(0, 8)
 local stroke = Instance.new("UIStroke", mainFrame)
 stroke.Color = Color3.fromRGB(100, 150, 255)
 stroke.Thickness = 2
 
 -- 标题栏
 local titleBar = Instance.new("TextButton")
-titleBar.Size = UDim2.new(1, 0, 0, 30)
+titleBar.Size = UDim2.new(1, 0, 0, 26)
 titleBar.BackgroundColor3 = Color3.fromRGB(40, 40, 55)
 titleBar.BorderSizePixel = 0
-titleBar.Text = "  TP Hub - 位置传送器"
+titleBar.Text = "  TP Hub"
 titleBar.Font = Enum.Font.GothamBold
-titleBar.TextSize = 13
+titleBar.TextSize = 12
 titleBar.TextColor3 = Color3.fromRGB(100, 150, 255)
 titleBar.TextXAlignment = Enum.TextXAlignment.Left
 titleBar.AutoButtonColor = false
 titleBar.Active = true
 titleBar.Parent = mainFrame
-Instance.new("UICorner", titleBar).CornerRadius = UDim.new(0, 8)
+Instance.new("UICorner", titleBar).CornerRadius = UDim.new(0, 6)
+
+-- 最小化按钮 (扳手图标)
+local minBtn = Instance.new("TextButton")
+minBtn.Size = UDim2.new(0, 22, 0, 20)
+minBtn.Position = UDim2.new(1, -50, 0, 3)
+minBtn.BackgroundColor3 = Color3.fromRGB(60, 60, 75)
+minBtn.BorderSizePixel = 0
+minBtn.Text = "🔧"
+minBtn.Font = Enum.Font.Gotham
+minBtn.TextSize = 11
+minBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
+minBtn.AutoButtonColor = false
+minBtn.Parent = titleBar
+Instance.new("UICorner", minBtn).CornerRadius = UDim.new(0, 4)
 
 -- 关闭按钮
 local closeBtn = Instance.new("TextButton")
-closeBtn.Size = UDim2.new(0, 24, 0, 24)
-closeBtn.Position = UDim2.new(1, -26, 0, 3)
+closeBtn.Size = UDim2.new(0, 22, 0, 20)
+closeBtn.Position = UDim2.new(1, -25, 0, 3)
 closeBtn.BackgroundColor3 = Color3.fromRGB(220, 50, 50)
 closeBtn.BorderSizePixel = 0
 closeBtn.Text = "X"
 closeBtn.Font = Enum.Font.GothamBold
-closeBtn.TextSize = 11
+closeBtn.TextSize = 10
 closeBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
 closeBtn.AutoButtonColor = false
 closeBtn.Parent = titleBar
-Instance.new("UICorner", closeBtn).CornerRadius = UDim.new(0, 5)
+Instance.new("UICorner", closeBtn).CornerRadius = UDim.new(0, 4)
 
 closeBtn.MouseButton1Click:Connect(function()
     if glideConn then stopGlide() end
@@ -173,10 +187,71 @@ closeBtn.MouseButton1Click:Connect(function()
     _G.TPHubLoaded = false
 end)
 
+-- ========== 最小化成扳手图标 ==========
+local wrenchBtn = Instance.new("TextButton")
+wrenchBtn.Size = UDim2.new(0, 44, 0, 44)
+wrenchBtn.Position = UDim2.new(0, 10, 0, 10)
+wrenchBtn.BackgroundColor3 = Color3.fromRGB(40, 40, 55)
+wrenchBtn.BorderSizePixel = 0
+wrenchBtn.Text = "🔧"
+wrenchBtn.Font = Enum.Font.Gotham
+wrenchBtn.TextSize = 22
+wrenchBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
+wrenchBtn.AutoButtonColor = false
+wrenchBtn.Active = true
+wrenchBtn.Visible = false
+wrenchBtn.Parent = gui
+Instance.new("UICorner", wrenchBtn).CornerRadius = UDim.new(0, 10)
+local wrenchStroke = Instance.new("UIStroke", wrenchBtn)
+wrenchStroke.Color = Color3.fromRGB(100, 150, 255)
+wrenchStroke.Thickness = 2
+
+-- 扳手按钮拖拽
+local wrenchDragging = false
+local wrenchDragStart, wrenchStartPos
+wrenchBtn.InputBegan:Connect(function(input)
+    if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
+        wrenchDragging = true
+        wrenchDragStart = input.Position
+        wrenchStartPos = wrenchBtn.Position
+    end
+end)
+UserInputService.InputChanged:Connect(function(input)
+    if wrenchDragging and (input.UserInputType == Enum.UserInputType.MouseMovement or input.UserInputType == Enum.UserInputType.Touch) then
+        local delta = input.Position - wrenchDragStart
+        wrenchBtn.Position = UDim2.new(
+            wrenchStartPos.X.Scale, wrenchStartPos.X.Offset + delta.X,
+            wrenchStartPos.Y.Scale, wrenchStartPos.Y.Offset + delta.Y
+        )
+    end
+end)
+UserInputService.InputEnded:Connect(function(input)
+    if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
+        wrenchDragging = false
+    end
+end)
+
+-- 点击扳手恢复
+wrenchBtn.MouseButton1Click:Connect(function()
+    mainFrame.Visible = true
+    wrenchBtn.Visible = false
+end)
+
+-- 点击最小化
+minBtn.MouseButton1Click:Connect(function()
+    mainFrame.Visible = false
+    wrenchBtn.Visible = true
+    -- 扳手位置跟主窗口位置
+    wrenchBtn.Position = UDim2.new(
+        mainFrame.Position.X.Scale, mainFrame.Position.X.Offset + 10,
+        mainFrame.Position.Y.Scale, mainFrame.Position.Y.Offset + 10
+    )
+end)
+
 -- 速度显示
 local speedLabel = Instance.new("TextLabel")
-speedLabel.Size = UDim2.new(1, -16, 0, 18)
-speedLabel.Position = UDim2.new(0, 8, 0, 34)
+speedLabel.Size = UDim2.new(1, -16, 0, 14)
+speedLabel.Position = UDim2.new(0, 8, 0, 30)
 speedLabel.BackgroundTransparency = 1
 speedLabel.Text = "平移速度: " .. glideSpeed
 speedLabel.Font = Enum.Font.Gotham
@@ -187,8 +262,8 @@ speedLabel.Parent = mainFrame
 
 -- 速度滑块
 local sliderBg = Instance.new("Frame")
-sliderBg.Size = UDim2.new(1, -16, 0, 8)
-sliderBg.Position = UDim2.new(0, 8, 0, 54)
+sliderBg.Size = UDim2.new(1, -16, 0, 6)
+sliderBg.Position = UDim2.new(0, 8, 0, 46)
 sliderBg.BackgroundColor3 = Color3.fromRGB(50, 50, 65)
 sliderBg.BorderSizePixel = 0
 sliderBg.Parent = mainFrame
@@ -239,8 +314,8 @@ end)
 
 -- 按钮容器
 local btnContainer = Instance.new("Frame")
-btnContainer.Size = UDim2.new(1, -16, 0, 36)
-btnContainer.Position = UDim2.new(0, 8, 0, 70)
+btnContainer.Size = UDim2.new(1, -16, 0, 30)
+btnContainer.Position = UDim2.new(0, 8, 0, 58)
 btnContainer.BackgroundTransparency = 1
 btnContainer.Parent = mainFrame
 
@@ -288,20 +363,20 @@ Instance.new("UICorner", clearBtn).CornerRadius = UDim.new(0, 6)
 
 -- 列表标题
 local listTitle = Instance.new("TextLabel")
-listTitle.Size = UDim2.new(1, -16, 0, 16)
-listTitle.Position = UDim2.new(0, 8, 0, 112)
+listTitle.Size = UDim2.new(1, -16, 0, 14)
+listTitle.Position = UDim2.new(0, 8, 0, 94)
 listTitle.BackgroundTransparency = 1
 listTitle.Text = "已保存的位置:"
 listTitle.Font = Enum.Font.Gotham
-listTitle.TextSize = 10
+listTitle.TextSize = 9
 listTitle.TextColor3 = Color3.fromRGB(150, 150, 170)
 listTitle.TextXAlignment = Enum.TextXAlignment.Left
 listTitle.Parent = mainFrame
 
 -- 位置列表 (ScrollingFrame)
 local posList = Instance.new("ScrollingFrame")
-posList.Size = UDim2.new(1, -16, 1, -136)
-posList.Position = UDim2.new(0, 8, 0, 130)
+posList.Size = UDim2.new(1, -16, 1, -114)
+posList.Position = UDim2.new(0, 8, 0, 110)
 posList.BackgroundTransparency = 1
 posList.BorderSizePixel = 0
 posList.ScrollBarThickness = 4
@@ -330,29 +405,29 @@ local function refreshList()
     -- 重新生成
     for i, posData in ipairs(savedPositions) do
         local item = Instance.new("Frame")
-        item.Size = UDim2.new(1, 0, 0, 56)
+        item.Size = UDim2.new(1, 0, 0, 48)
         item.BackgroundColor3 = Color3.fromRGB(35, 35, 48)
         item.BorderSizePixel = 0
         item.LayoutOrder = i
         item.Parent = posList
-        Instance.new("UICorner", item).CornerRadius = UDim.new(0, 6)
+        Instance.new("UICorner", item).CornerRadius = UDim.new(0, 5)
 
         -- 位置名称
         local nameLabel = Instance.new("TextLabel")
-        nameLabel.Size = UDim2.new(1, -8, 0, 16)
-        nameLabel.Position = UDim2.new(0, 6, 0, 4)
+        nameLabel.Size = UDim2.new(1, -8, 0, 14)
+        nameLabel.Position = UDim2.new(0, 6, 0, 3)
         nameLabel.BackgroundTransparency = 1
-        nameLabel.Text = "位置 " .. i .. " (" .. math.floor(posData.pos.X) .. ", " .. math.floor(posData.pos.Y) .. ", " .. math.floor(posData.pos.Z) .. ")"
+        nameLabel.Text = "位置" .. i .. " (" .. math.floor(posData.pos.X) .. "," .. math.floor(posData.pos.Y) .. "," .. math.floor(posData.pos.Z) .. ")"
         nameLabel.Font = Enum.Font.GothamBold
-        nameLabel.TextSize = 11
+        nameLabel.TextSize = 10
         nameLabel.TextColor3 = Color3.fromRGB(200, 200, 220)
         nameLabel.TextXAlignment = Enum.TextXAlignment.Left
         nameLabel.Parent = item
 
         -- 瞬移按钮
         local tpBtn = Instance.new("TextButton")
-        tpBtn.Size = UDim2.new(0.3, -4, 0, 26)
-        tpBtn.Position = UDim2.new(0, 6, 0, 24)
+        tpBtn.Size = UDim2.new(0.3, -4, 0, 24)
+        tpBtn.Position = UDim2.new(0, 6, 0, 20)
         tpBtn.BackgroundColor3 = Color3.fromRGB(0, 120, 200)
         tpBtn.BorderSizePixel = 0
         tpBtn.Text = "瞬移"
@@ -370,8 +445,8 @@ local function refreshList()
 
         -- 平移按钮
         local glideBtn = Instance.new("TextButton")
-        glideBtn.Size = UDim2.new(0.3, -4, 0, 26)
-        glideBtn.Position = UDim2.new(0.33, 2, 0, 24)
+        glideBtn.Size = UDim2.new(0.3, -4, 0, 24)
+        glideBtn.Position = UDim2.new(0.33, 2, 0, 20)
         glideBtn.BackgroundColor3 = Color3.fromRGB(100, 150, 255)
         glideBtn.BorderSizePixel = 0
         glideBtn.Text = "平移"
@@ -390,8 +465,8 @@ local function refreshList()
 
         -- 删除按钮
         local delBtn = Instance.new("TextButton")
-        delBtn.Size = UDim2.new(0.3, -4, 0, 26)
-        delBtn.Position = UDim2.new(0.66, 2, 0, 24)
+        delBtn.Size = UDim2.new(0.3, -4, 0, 24)
+        delBtn.Position = UDim2.new(0.66, 2, 0, 20)
         delBtn.BackgroundColor3 = Color3.fromRGB(150, 50, 50)
         delBtn.BorderSizePixel = 0
         delBtn.Text = "删除"
